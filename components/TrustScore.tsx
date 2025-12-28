@@ -461,4 +461,28 @@ export function TrustIndicator({ score, isVerified = false, size = 'sm' }: Trust
   );
 }
 
+// Trust Score Badge (Compact badge with score and verified status)
+interface TrustScoreBadgeProps {
+  score: number;
+  verified?: boolean;
+  size?: 'sm' | 'md';
+}
+
+export function TrustScoreBadge({ score, verified = false, size = 'sm' }: TrustScoreBadgeProps) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+        <Star size={size === 'sm' ? 10 : 12} className="fill-amber-400 text-amber-400" />
+        <span className={cn(
+          "font-medium text-amber-500 tabular-nums",
+          size === 'sm' ? 'text-[10px]' : 'text-xs'
+        )}>
+          {score.toFixed(1)}
+        </span>
+      </div>
+      {verified && <VerifiedBadge isVerified size={size} />}
+    </div>
+  );
+}
+
 export default TrustScoreCard;

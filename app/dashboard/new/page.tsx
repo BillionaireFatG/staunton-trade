@@ -337,7 +337,6 @@ export default function NewDealPage() {
             </Button>
           </div>
         </form>
-      </main>
     </div>
   );
 }
