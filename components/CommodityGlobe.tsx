@@ -151,6 +151,8 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
   const [lastMouse, setLastMouse] = useState<[number, number]>([0, 0]);
   const [selectedHotspot, setSelectedHotspot] = useState<typeof COMMODITY_HOTSPOTS[0] | null>(null);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const animationRef = useRef<number | undefined>(undefined);
 
   const width = 800;
@@ -159,14 +161,20 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
   // Load world data
   useEffect(() => {
     const loadWorldData = async () => {
+      setIsLoading(true);
+      setLoadError(false);
       try {
         const response = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+        if (!response.ok) throw new Error('Failed to fetch');
         const world: any = await response.json();
         const countriesFeatureCollection = feature(world, world.objects.countries) as unknown as FeatureCollection;
         const countries = countriesFeatureCollection.features;
         setWorldData(countries);
       } catch (error) {
         console.error('Error loading world data:', error);
+        setLoadError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadWorldData();
@@ -506,6 +514,45 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       default: return <MapPin size={14} />;
     }
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div ref={containerRef} className={`relative ${className}`}>
+        <div className="w-full h-[500px] rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
+          <div className="text-center">
+            <Globe2 size={64} className="text-neutral-300 dark:text-neutral-600 mx-auto mb-4 animate-spin" style={{ animationDuration: '3s' }} />
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">Loading global trade map...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with fallback
+  if (loadError || worldData.length === 0) {
+    return (
+      <div ref={containerRef} className={`relative ${className}`}>
+        <div className="w-full h-[500px] rounded-2xl bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 flex items-center justify-center">
+          <div className="text-center max-w-md px-4">
+            <Globe2 size={64} className="text-neutral-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Global Commodity Network</h3>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4">
+              Track real-time commodity flows across {COMMODITY_HOTSPOTS.length}+ major trading hubs worldwide.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {COMMODITY_HOTSPOTS.slice(0, 8).map((spot) => (
+                <Badge key={spot.id} variant="secondary" className="text-xs">
+                  {spot.name}
+                </Badge>
+              ))}
+              <Badge variant="outline" className="text-xs">+{COMMODITY_HOTSPOTS.length - 8} more</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
