@@ -123,20 +123,22 @@ export default function Navigation() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <>
-                <Link 
+              <div className="flex items-center gap-3 relative z-[100]" style={{ pointerEvents: 'auto' }}>
+                <a 
                   href="/sign-in" 
-                  className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   Sign In
-                </Link>
-                <Link 
+                </a>
+                <a 
                   href="/sign-up" 
-                  className="px-5 py-2.5 text-sm font-semibold bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-sm"
+                  className="px-5 py-2.5 text-sm font-semibold bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-colors shadow-sm cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   Get Started
-                </Link>
-              </>
+                </a>
+              </div>
             )}
           </div>
 

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Globe, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -64,27 +63,27 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <motion.div 
-              className="flex flex-col sm:flex-row items-start gap-4 mb-12 relative z-50"
+              className="flex flex-col sm:flex-row items-start gap-4 mb-12 relative z-[100]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
               style={{ pointerEvents: 'auto' }}
             >
-              <Link 
+              <a 
                 href="/sign-up"
-                className="group flex items-center gap-2 px-8 py-4 text-base font-semibold bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-all shadow-lg shadow-neutral-900/20 cursor-pointer relative z-50"
+                className="group flex items-center gap-2 px-8 py-4 text-base font-semibold bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-all shadow-lg shadow-neutral-900/20 cursor-pointer"
                 style={{ pointerEvents: 'auto' }}
               >
                 Request Access
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link 
+              </a>
+              <a 
                 href="/sign-in"
-                className="px-8 py-4 text-base font-semibold text-neutral-700 border-2 border-neutral-300 rounded-xl hover:bg-neutral-50 hover:border-neutral-400 transition-all cursor-pointer relative z-50"
+                className="px-8 py-4 text-base font-semibold text-neutral-700 border-2 border-neutral-300 rounded-xl hover:bg-neutral-50 hover:border-neutral-400 transition-all cursor-pointer"
                 style={{ pointerEvents: 'auto' }}
               >
                 Sign In
-              </Link>
+              </a>
             </motion.div>
 
             {/* Stats */}
