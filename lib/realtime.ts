@@ -99,7 +99,7 @@ class RealtimeService {
   private globalListeners: Set<(event: RealtimeEvent) => void> = new Set();
   private status: ConnectionStatus = 'disconnected';
   private statusListeners: Set<(status: ConnectionStatus) => void> = new Set();
-  private simulationInterval: NodeJS.Timer | null = null;
+  private simulationInterval: ReturnType<typeof setTimeout> | null = null;
   private isSimulating: boolean = false;
 
   connect() {

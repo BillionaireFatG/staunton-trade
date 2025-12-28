@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import { feature } from 'topojson-client';
+import type { FeatureCollection } from 'geojson';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -161,7 +162,7 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       try {
         const response = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
         const world: any = await response.json();
-        const countriesFeatureCollection = feature(world, world.objects.countries);
+        const countriesFeatureCollection = feature(world, world.objects.countries) as unknown as FeatureCollection;
         const countries = countriesFeatureCollection.features;
         setWorldData(countries);
       } catch (error) {

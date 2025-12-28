@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 export interface MenuBarItem {
-  icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element
+  icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactElement
   label: string
   onClick?: () => void
 }
@@ -16,7 +16,7 @@ interface MenuBarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const springConfig = {
   duration: 0.3,
-  ease: "easeInOut"
+  ease: "easeInOut" as const
 }
 
 export function MenuBar({ items, className, ...props }: MenuBarProps) {

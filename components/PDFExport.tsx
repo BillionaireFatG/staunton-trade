@@ -149,11 +149,11 @@ type ExportStatus = 'idle' | 'preparing' | 'generating' | 'complete' | 'error';
 
 function ExportStatusIndicator({ status, progress }: { status: ExportStatus; progress: number }) {
   const statusConfig = {
-    idle: { icon: FileText, label: 'Ready to export', color: 'text-muted-foreground' },
+    idle: { icon: FileText, label: 'Ready to export', color: 'text-muted-foreground', animate: false },
     preparing: { icon: Loader2, label: 'Preparing data...', color: 'text-amber-500', animate: true },
     generating: { icon: Loader2, label: `Generating PDF (${progress}%)...`, color: 'text-blue-500', animate: true },
-    complete: { icon: Check, label: 'Export complete!', color: 'text-emerald-500' },
-    error: { icon: AlertCircle, label: 'Export failed', color: 'text-red-500' },
+    complete: { icon: Check, label: 'Export complete!', color: 'text-emerald-500', animate: false },
+    error: { icon: AlertCircle, label: 'Export failed', color: 'text-red-500', animate: false },
   };
 
   const config = statusConfig[status];
