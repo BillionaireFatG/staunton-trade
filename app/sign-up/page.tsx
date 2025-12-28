@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Building2, Eye, EyeOff, Loader2, Check, X } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Check, X } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export default function SignUp() {
   const router = useRouter();
@@ -61,11 +62,8 @@ export default function SignUp() {
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b border-neutral-200">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center">
-            <Building2 size={16} className="text-white" />
-          </div>
-          <span className="font-semibold text-neutral-900">Staunton Trade</span>
+        <Link href="/">
+          <Logo size="sm" variant="dark" />
         </Link>
       </header>
 

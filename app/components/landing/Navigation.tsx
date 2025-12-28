@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, X, Building2, User, Gift, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, User, Gift, Settings, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 import { supabase } from '@/lib/supabase';
 import {
   DropdownMenu,
@@ -46,11 +47,8 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-neutral-900 flex items-center justify-center">
-              <Building2 size={18} className="text-white" />
-            </div>
-            <span className="text-xl font-bold text-neutral-900 tracking-tight">Staunton Trade</span>
+          <Link href="/" className="flex items-center">
+            <Logo size="md" variant="dark" />
           </Link>
           
           {/* Desktop Navigation */}
@@ -93,7 +91,7 @@ export default function Navigation() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard" className="cursor-pointer">
-                      <Building2 size={14} className="mr-2" />
+                      <LayoutDashboard size={14} className="mr-2" />
                       Dashboard
                     </Link>
                   </DropdownMenuItem>

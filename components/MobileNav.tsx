@@ -19,11 +19,11 @@ import {
   Bell,
   Settings,
   LogOut,
-  Building2,
   ChevronRight,
   HelpCircle,
   Sparkles,
 } from 'lucide-react';
+import { Logo, LogoIcon } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -163,12 +163,7 @@ export function MobileMenu({ isOpen, onClose, user, onSignOut }: MobileMenuProps
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Building2 size={16} className="text-primary-foreground" />
-                </div>
-                <span className="font-semibold text-foreground">Staunton Trade</span>
-              </div>
+              <Logo size="sm" />
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X size={20} />
               </Button>
@@ -276,9 +271,7 @@ export function MobileHeader({ title, onMenuClick, notificationCount = 0 }: Mobi
         </Button>
 
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-            <Building2 size={14} className="text-primary-foreground" />
-          </div>
+          <LogoIcon size={28} />
           <span className="font-semibold text-foreground">
             {title || 'Staunton Trade'}
           </span>

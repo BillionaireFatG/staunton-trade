@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Building2, Twitter, Linkedin, Github } from 'lucide-react';
+import { Twitter, Linkedin, Github } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 const footerLinks = {
   product: [
@@ -30,11 +31,8 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-neutral-900 flex items-center justify-center">
-                <Building2 size={18} className="text-white" />
-              </div>
-              <span className="text-xl font-bold text-neutral-900">Staunton</span>
+            <Link href="/" className="inline-block mb-4">
+              <Logo size="md" variant="dark" />
             </Link>
             <p className="text-sm text-neutral-600 mb-4 max-w-xs leading-relaxed">
               The premier platform for commodities professionals. 

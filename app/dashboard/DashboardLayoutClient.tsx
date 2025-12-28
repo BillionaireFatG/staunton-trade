@@ -3,7 +3,6 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { 
-  Building2,
   LayoutDashboard, 
   Briefcase, 
   MessageSquare, 
@@ -20,6 +19,7 @@ import {
   MoreHorizontal,
   Bell
 } from 'lucide-react';
+import { Logo, LogoIcon } from '@/components/Logo';
 import { supabase } from '@/lib/supabase';
 import { ThemeCustomizer } from '@/components/ThemeCustomizer';
 import { useUnreadMessages } from '@/lib/useUnreadMessages';
@@ -76,11 +76,8 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
       <aside className="fixed left-0 top-0 bottom-0 w-60 z-50 border-r border-border bg-card hidden md:flex flex-col">
         {/* Logo */}
         <div className="h-14 flex items-center px-4 border-b border-border flex-shrink-0">
-          <a href="/dashboard" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <Building2 size={14} className="text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">Staunton Trade</span>
+          <a href="/dashboard" className="flex items-center">
+            <Logo size="sm" />
           </a>
         </div>
 
