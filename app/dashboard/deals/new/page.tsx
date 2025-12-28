@@ -127,19 +127,19 @@ export default function NewDealPage() {
       <div className="mb-8">
         <Link 
           href="/dashboard/deals" 
-          className="inline-flex items-center gap-2 text-[13px] text-[#666] hover:text-white transition-colors mb-4"
+          className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft size={14} />
           Back to Deals
         </Link>
         
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] flex items-center justify-center shadow-lg shadow-[#3b82f6]/20">
-            <Sparkles size={18} className="text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+            <Sparkles size={18} className="text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-white tracking-tight">Create New Deal</h1>
-            <p className="text-[13px] text-[#666] mt-0.5">Fill in the details to create a new commodity deal</p>
+            <h1 className="text-2xl font-semibold text-foreground tracking-tight">Create New Deal</h1>
+            <p className="text-[13px] text-muted-foreground mt-0.5">Fill in the details to create a new commodity deal</p>
           </div>
         </div>
       </div>
@@ -147,47 +147,47 @@ export default function NewDealPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Error Message */}
         {error && (
-          <div className="p-4 rounded-xl bg-[#ef4444]/10 border border-[#ef4444]/20 flex items-center gap-3">
-            <AlertCircle size={18} className="text-[#ef4444] flex-shrink-0" />
-            <p className="text-[13px] text-[#ef4444]">{error}</p>
+          <div className="p-4 rounded-xl bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 flex items-center gap-3">
+            <AlertCircle size={18} className="text-red-500 flex-shrink-0" />
+            <p className="text-[13px] text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
 
         {/* Commodity Section */}
-        <div className="rounded-xl bg-[#111113] border border-[#1a1a1a] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#1a1a1a]">
-            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2">
-              <Package size={16} className="text-[#3b82f6]" />
+        <div className="rounded-xl bg-card border border-border overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
+              <Package size={16} className="text-primary" />
               Commodity Details
             </h2>
           </div>
           <div className="p-5 space-y-5">
             <div>
-              <Label htmlFor="commodity_type" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
-                Commodity Type <span className="text-[#ef4444]">*</span>
+              <Label htmlFor="commodity_type" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                Commodity Type <span className="text-red-500">*</span>
               </Label>
               <Select
                 value={formData.commodity_type}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, commodity_type: value }))}
                 disabled={loading}
               >
-                <SelectTrigger className="w-full h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white rounded-lg focus:ring-1 focus:ring-[#3b82f6]">
+                <SelectTrigger className="w-full h-10">
                   <SelectValue placeholder="Select commodity type" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#141414] border-[#262626]">
-                  <SelectItem value="Diesel" className="text-[14px]">Diesel</SelectItem>
-                  <SelectItem value="Jet Fuel" className="text-[14px]">Jet Fuel</SelectItem>
-                  <SelectItem value="Gasoline" className="text-[14px]">Gasoline</SelectItem>
-                  <SelectItem value="Crude Oil" className="text-[14px]">Crude Oil</SelectItem>
-                  <SelectItem value="LNG" className="text-[14px]">LNG</SelectItem>
+                <SelectContent>
+                  <SelectItem value="Diesel">Diesel</SelectItem>
+                  <SelectItem value="Jet Fuel">Jet Fuel</SelectItem>
+                  <SelectItem value="Gasoline">Gasoline</SelectItem>
+                  <SelectItem value="Crude Oil">Crude Oil</SelectItem>
+                  <SelectItem value="LNG">LNG</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="volume" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
-                  Volume (BBL) <span className="text-[#ef4444]">*</span>
+                <Label htmlFor="volume" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                  Volume (BBL) <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -200,15 +200,15 @@ export default function NewDealPage() {
                   step="0.01"
                   disabled={loading}
                   placeholder="0"
-                  className="h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white placeholder:text-[#555] rounded-lg focus:ring-1 focus:ring-[#3b82f6]"
+                  className="h-10"
                 />
               </div>
               <div>
-                <Label htmlFor="price_per_unit" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
-                  Price per Unit <span className="text-[#ef4444]">*</span>
+                <Label htmlFor="price_per_unit" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                  Price per Unit <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555] text-[14px]">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[14px]">$</span>
                   <Input
                     type="number"
                     id="price_per_unit"
@@ -220,37 +220,37 @@ export default function NewDealPage() {
                     step="0.01"
                     disabled={loading}
                     placeholder="0.00"
-                    className="h-10 pl-7 bg-[#0a0a0a] border-[#262626] text-[14px] text-white placeholder:text-[#555] rounded-lg focus:ring-1 focus:ring-[#3b82f6]"
+                    className="h-10 pl-7"
                   />
                 </div>
               </div>
             </div>
 
             {/* Total Value Display */}
-            <div className="p-4 rounded-lg bg-gradient-to-r from-[#3b82f6]/10 to-[#10b981]/10 border border-[#3b82f6]/20">
+            <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <DollarSign size={16} className="text-[#10b981]" />
-                  <span className="text-[12px] font-medium text-[#888] uppercase tracking-wider">Total Value</span>
+                  <DollarSign size={16} className="text-primary" />
+                  <span className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Total Value</span>
                 </div>
-                <span className="text-xl font-semibold text-white">{formatCurrency(totalValue)}</span>
+                <span className="text-xl font-semibold text-foreground">{formatCurrency(totalValue)}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Parties Section */}
-        <div className="rounded-xl bg-[#111113] border border-[#1a1a1a] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#1a1a1a]">
-            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2">
-              <Users size={16} className="text-[#8b5cf6]" />
+        <div className="rounded-xl bg-card border border-border overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
+              <Users size={16} className="text-purple-500" />
               Parties
             </h2>
           </div>
           <div className="p-5 grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="buyer_name" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
-                Buyer Name <span className="text-[#ef4444]">*</span>
+              <Label htmlFor="buyer_name" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                Buyer Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
@@ -261,12 +261,12 @@ export default function NewDealPage() {
                 required
                 disabled={loading}
                 placeholder="Enter buyer name"
-                className="h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white placeholder:text-[#555] rounded-lg focus:ring-1 focus:ring-[#3b82f6]"
+                className="h-10"
               />
             </div>
             <div>
-              <Label htmlFor="seller_name" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
-                Seller Name <span className="text-[#ef4444]">*</span>
+              <Label htmlFor="seller_name" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                Seller Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
@@ -277,23 +277,23 @@ export default function NewDealPage() {
                 required
                 disabled={loading}
                 placeholder="Enter seller name"
-                className="h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white placeholder:text-[#555] rounded-lg focus:ring-1 focus:ring-[#3b82f6]"
+                className="h-10"
               />
             </div>
           </div>
         </div>
 
         {/* Timeline Section */}
-        <div className="rounded-xl bg-[#111113] border border-[#1a1a1a] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#1a1a1a]">
-            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2">
-              <Calendar size={16} className="text-[#f59e0b]" />
+        <div className="rounded-xl bg-card border border-border overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
+              <Calendar size={16} className="text-amber-500" />
               Timeline
             </h2>
           </div>
           <div className="p-5 grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="contract_date" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
+              <Label htmlFor="contract_date" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
                 Contract Date
               </Label>
               <Input
@@ -303,11 +303,11 @@ export default function NewDealPage() {
                 value={formData.contract_date}
                 onChange={handleChange}
                 disabled={loading}
-                className="h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white rounded-lg focus:ring-1 focus:ring-[#3b82f6] [color-scheme:dark]"
+                className="h-10"
               />
             </div>
             <div>
-              <Label htmlFor="injection_date" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
+              <Label htmlFor="injection_date" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
                 Injection Date
               </Label>
               <Input
@@ -317,11 +317,11 @@ export default function NewDealPage() {
                 value={formData.injection_date}
                 onChange={handleChange}
                 disabled={loading}
-                className="h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white rounded-lg focus:ring-1 focus:ring-[#3b82f6] [color-scheme:dark]"
+                className="h-10"
               />
             </div>
             <div>
-              <Label htmlFor="delivery_date" className="text-[12px] font-medium text-[#888] uppercase tracking-wider mb-2 block">
+              <Label htmlFor="delivery_date" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
                 Delivery Date
               </Label>
               <Input
@@ -331,17 +331,17 @@ export default function NewDealPage() {
                 value={formData.delivery_date}
                 onChange={handleChange}
                 disabled={loading}
-                className="h-10 bg-[#0a0a0a] border-[#262626] text-[14px] text-white rounded-lg focus:ring-1 focus:ring-[#3b82f6] [color-scheme:dark]"
+                className="h-10"
               />
             </div>
           </div>
         </div>
 
         {/* Notes Section */}
-        <div className="rounded-xl bg-[#111113] border border-[#1a1a1a] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#1a1a1a]">
-            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2">
-              <FileText size={16} className="text-[#888]" />
+        <div className="rounded-xl bg-card border border-border overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
+              <FileText size={16} className="text-muted-foreground" />
               Additional Notes
             </h2>
           </div>
@@ -354,15 +354,15 @@ export default function NewDealPage() {
               disabled={loading}
               rows={4}
               placeholder="Add any additional notes about this deal..."
-              className="bg-[#0a0a0a] border-[#262626] text-[14px] text-white placeholder:text-[#555] rounded-lg focus:ring-1 focus:ring-[#3b82f6] resize-none"
+              className="resize-none"
             />
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-2">
-          <p className="text-[12px] text-[#555]">
-            <span className="text-[#ef4444]">*</span> Required fields
+          <p className="text-[12px] text-muted-foreground">
+            <span className="text-red-500">*</span> Required fields
           </p>
           <div className="flex gap-3">
             <Button
@@ -370,14 +370,12 @@ export default function NewDealPage() {
               variant="ghost"
               onClick={() => router.push('/dashboard/deals')}
               disabled={loading}
-              className="h-10 px-5 text-[13px] font-medium text-[#888] hover:text-white hover:bg-[#141414]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="h-10 px-5 text-[13px] font-medium bg-[#3b82f6] hover:bg-[#2563eb] text-white shadow-lg shadow-[#3b82f6]/20 transition-all duration-200"
             >
               {loading ? (
                 <>
