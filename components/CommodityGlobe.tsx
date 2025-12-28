@@ -150,7 +150,7 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
   const [lastMouse, setLastMouse] = useState<[number, number]>([0, 0]);
   const [selectedHotspot, setSelectedHotspot] = useState<typeof COMMODITY_HOTSPOTS[0] | null>(null);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   const width = 800;
   const height = 600;
