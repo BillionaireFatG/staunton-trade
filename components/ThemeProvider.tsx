@@ -37,13 +37,13 @@ const DEFAULT_AUTO_CONFIG: AutoThemeConfig = {
 const CUSTOM_THEMES = ['monochrome', 'monochrome-dark', 'purple-hollow', 'purple-hollow-dark', 'sunset', 'sunset-dark', 'ocean', 'ocean-dark'];
 
 const initialState: ThemeProviderState = {
-  theme: 'system',
+  theme: 'light',
   setTheme: () => null,
-  resolvedTheme: 'dark',
+  resolvedTheme: 'light',
   autoConfig: DEFAULT_AUTO_CONFIG,
   setAutoConfig: () => null,
   isAutoActive: false,
-  customTheme: null,
+  customTheme: 'monochrome',
   setCustomTheme: () => null,
 };
 
@@ -87,9 +87,9 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<ThemeMode>(defaultTheme);
-  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('dark');
+  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('light');
   const [autoConfig, setAutoConfigState] = useState<AutoThemeConfig>(DEFAULT_AUTO_CONFIG);
-  const [customTheme, setCustomThemeState] = useState<string | null>(null);
+  const [customTheme, setCustomThemeState] = useState<string | null>('monochrome');
   const [mounted, setMounted] = useState(false);
 
   // Load stored preferences

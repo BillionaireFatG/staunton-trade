@@ -23,39 +23,46 @@ const themeScript = `
       const storedAccent = localStorage.getItem('staunton-accent-color');
       const html = document.documentElement;
       
-      // Apply custom theme
+      // Apply custom theme or default to light
       if (storedCustomTheme && CUSTOM_THEMES.includes(storedCustomTheme)) {
         html.classList.add(storedCustomTheme);
         if (storedCustomTheme.includes('-dark')) {
           html.classList.add('dark');
+        } else {
+          html.classList.add('light');
         }
       } else if (storedTheme === 'dark') {
         html.classList.add('dark');
       } else if (storedTheme === 'system') {
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
           html.classList.add('dark');
+        } else {
+          html.classList.add('light');
         }
+      } else {
+        // Default to light theme with monochrome
+        html.classList.add('light');
+        html.classList.add('monochrome');
       }
       
-      // Apply accent color
-      if (storedAccent) {
-        const accentMap = {
-          'copper': '24 35% 35%',
-          'gold': '38 92% 50%',
-          'emerald': '160 84% 39%',
-          'blue': '217 91% 60%',
-          'purple': '262 83% 58%',
-          'pink': '330 81% 60%',
-          'red': '0 84% 60%',
-          'orange': '25 95% 53%',
-          'teal': '175 77% 40%',
-          'cyan': '189 94% 43%',
-          'monochrome': '0 0% 20%',
-        };
-        if (accentMap[storedAccent]) {
-          html.style.setProperty('--primary', accentMap[storedAccent]);
-          html.style.setProperty('--ring', accentMap[storedAccent]);
-        }
+      // Apply accent color (default to monochrome if not set)
+      const accentMap = {
+        'copper': '24 35% 35%',
+        'gold': '38 92% 50%',
+        'emerald': '160 84% 39%',
+        'blue': '217 91% 60%',
+        'purple': '262 83% 58%',
+        'pink': '330 81% 60%',
+        'red': '0 84% 60%',
+        'orange': '25 95% 53%',
+        'teal': '175 77% 40%',
+        'cyan': '189 94% 43%',
+        'monochrome': '0 0% 20%',
+      };
+      const accent = storedAccent || 'monochrome';
+      if (accentMap[accent]) {
+        html.style.setProperty('--primary', accentMap[accent]);
+        html.style.setProperty('--ring', accentMap[accent]);
       }
     } catch (e) {}
   })();
@@ -72,7 +79,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider defaultTheme="dark" storageKey="staunton-theme">
+        <ThemeProvider defaultTheme="light" storageKey="staunton-theme">
           {children}
         </ThemeProvider>
       </body>
