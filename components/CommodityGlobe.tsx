@@ -161,7 +161,8 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       try {
         const response = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
         const world: any = await response.json();
-        const countries = feature(world, world.objects.countries).features;
+        const countriesFeatureCollection = feature(world, world.objects.countries);
+        const countries = countriesFeatureCollection.features;
         setWorldData(countries);
       } catch (error) {
         console.error('Error loading world data:', error);
