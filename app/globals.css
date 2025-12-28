@@ -1,26 +1,734 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================
+   STAUNTON TRADE - WORLD-CLASS THEME SYSTEM
+   ============================================
+   Themes: Light, Dark, Monochrome, Purple Hollow, Sunset, Ocean
+   All themes support customizable primary/secondary colors
+*/
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
+  /* ==========================================
+     LIGHT THEME (Default)
+     Clean, professional with warm accents
+     ========================================== */
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Core colors */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
+    
+    /* Card & surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+    
+    /* Primary - Rich brown/copper for commodity trading feel */
+    --primary: 24 35% 35%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Warm gold accent */
+    --secondary: 38 92% 85%;
+    --secondary-foreground: 24 60% 20%;
+    
+    /* Muted & accents */
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 39%;
+    --accent: 0 0% 91%;
+    --accent-foreground: 0 0% 9%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & inputs */
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 24 35% 35%;
+    
+    /* Radius */
+    --radius: 0.5rem;
+    
+    /* Charts */
+    --chart-1: 24 35% 35%;
+    --chart-2: 38 92% 85%;
+    --chart-3: 0 0% 91%;
+    --chart-4: 38 95% 78%;
+    --chart-5: 24 50% 28%;
+    
+    /* Sidebar */
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 0 0% 20%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 0 0% 70%;
+    
+    /* Status colors */
+    --success: 150 60% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 40 90% 50%;
+    --warning-foreground: 0 0% 9%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+  }
+
+  /* ==========================================
+     DARK THEME
+     Deep, sophisticated commodity trading dark
+     ========================================== */
+  .dark {
+    /* Core colors */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 93%;
+    
+    /* Card & surfaces */
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 93%;
+    
+    /* Primary - Warm gold/copper for dark theme */
+    --primary: 38 92% 85%;
+    --primary-foreground: 24 60% 8%;
+    
+    /* Secondary */
+    --secondary: 24 20% 18%;
+    --secondary-foreground: 38 92% 85%;
+    
+    /* Muted & accents */
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 0 0% 17%;
+    --accent-foreground: 0 0% 93%;
+    
+    /* Destructive */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & inputs */
+    --border: 30 15% 12%;
+    --input: 0 0% 28%;
+    --ring: 38 92% 85%;
+    
+    /* Charts */
+    --chart-1: 38 92% 85%;
+    --chart-2: 24 20% 18%;
+    --chart-3: 0 0% 17%;
+    --chart-4: 30 25% 20%;
+    --chart-5: 38 90% 80%;
+    
+    /* Sidebar */
+    --sidebar: 0 0% 9%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 0% 83%;
+    
+    /* Status colors */
+    --success: 150 60% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 40 90% 55%;
+    --warning-foreground: 0 0% 9%;
+    --info: 217 91% 65%;
+    --info-foreground: 0 0% 100%;
+  }
+
+  /* ==========================================
+     MONOCHROME THEME
+     Pure black & white, ultra professional
+     ========================================== */
+  .monochrome {
+    /* Core colors */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    
+    /* Card & surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    
+    /* Primary - Pure black */
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+    
+    /* Muted & accents */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 0%;
+    
+    /* Destructive */
+    --destructive: 0 0% 20%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & inputs */
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 0 0% 0%;
+    
+    /* Charts */
+    --chart-1: 0 0% 0%;
+    --chart-2: 0 0% 30%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 0 0% 70%;
+    --chart-5: 0 0% 85%;
+    
+    /* Sidebar */
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 0 0% 0%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 0 0% 0%;
+    
+    /* Status colors */
+    --success: 0 0% 25%;
+    --success-foreground: 0 0% 100%;
+    --warning: 0 0% 40%;
+    --warning-foreground: 0 0% 100%;
+    --info: 0 0% 55%;
+    --info-foreground: 0 0% 100%;
+  }
+
+  /* Dark monochrome variant */
+  .monochrome-dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 0% 80%;
+    --destructive-foreground: 0 0% 0%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 100%;
+    --sidebar: 0 0% 3%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+  }
+
+  /* ==========================================
+     PURPLE HOLLOW THEME
+     Ethereal purple with translucent elements
+     ========================================== */
+  .purple-hollow {
+    /* Core colors */
+    --background: 270 20% 98%;
+    --foreground: 270 40% 15%;
+    
+    /* Card & surfaces */
+    --card: 270 30% 99%;
+    --card-foreground: 270 40% 15%;
+    --popover: 270 30% 99%;
+    --popover-foreground: 270 40% 15%;
+    
+    /* Primary - Rich purple */
+    --primary: 270 60% 55%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary */
+    --secondary: 270 40% 92%;
+    --secondary-foreground: 270 60% 35%;
+    
+    /* Muted & accents */
+    --muted: 270 20% 94%;
+    --muted-foreground: 270 15% 50%;
+    --accent: 270 30% 90%;
+    --accent-foreground: 270 40% 15%;
+    
+    /* Destructive */
+    --destructive: 350 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & inputs */
+    --border: 270 30% 88%;
+    --input: 270 30% 88%;
+    --ring: 270 60% 55%;
+    
+    /* Charts */
+    --chart-1: 270 60% 55%;
+    --chart-2: 290 50% 60%;
+    --chart-3: 250 50% 60%;
+    --chart-4: 300 40% 70%;
+    --chart-5: 260 55% 50%;
+    
+    /* Sidebar */
+    --sidebar: 270 25% 97%;
+    --sidebar-foreground: 270 40% 20%;
+    --sidebar-primary: 270 60% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 30% 92%;
+    --sidebar-accent-foreground: 270 40% 20%;
+    --sidebar-border: 270 25% 90%;
+    --sidebar-ring: 270 60% 55%;
+    
+    /* Status */
+    --success: 150 60% 45%;
+    --warning: 40 90% 55%;
+    --info: 270 60% 55%;
+  }
+
+  /* Purple hollow dark */
+  .purple-hollow-dark {
+    --background: 270 25% 6%;
+    --foreground: 270 20% 95%;
+    --card: 270 25% 9%;
+    --card-foreground: 270 20% 95%;
+    --popover: 270 25% 9%;
+    --popover-foreground: 270 20% 95%;
+    --primary: 270 70% 65%;
+    --primary-foreground: 270 25% 6%;
+    --secondary: 270 30% 15%;
+    --secondary-foreground: 270 70% 70%;
+    --muted: 270 20% 12%;
+    --muted-foreground: 270 15% 60%;
+    --accent: 270 25% 16%;
+    --accent-foreground: 270 20% 95%;
+    --destructive: 350 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 270 20% 18%;
+    --input: 270 20% 18%;
+    --ring: 270 70% 65%;
+    --sidebar: 270 25% 7%;
+    --sidebar-foreground: 270 20% 95%;
+    --sidebar-border: 270 20% 15%;
+  }
+
+  /* ==========================================
+     SUNSET THEME
+     Warm oranges and reds, energetic
+     ========================================== */
+  .sunset {
+    --background: 30 30% 97%;
+    --foreground: 20 50% 12%;
+    --card: 30 40% 99%;
+    --card-foreground: 20 50% 12%;
+    --popover: 30 40% 99%;
+    --popover-foreground: 20 50% 12%;
+    --primary: 20 90% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 35 80% 88%;
+    --secondary-foreground: 20 70% 25%;
+    --muted: 30 20% 93%;
+    --muted-foreground: 20 20% 45%;
+    --accent: 35 50% 90%;
+    --accent-foreground: 20 50% 12%;
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 25% 85%;
+    --input: 30 25% 85%;
+    --ring: 20 90% 50%;
+    --chart-1: 20 90% 50%;
+    --chart-2: 35 85% 55%;
+    --chart-3: 45 80% 60%;
+    --chart-4: 10 80% 50%;
+    --chart-5: 0 70% 55%;
+    --sidebar: 30 25% 96%;
+    --sidebar-foreground: 20 50% 15%;
+    --sidebar-border: 30 20% 88%;
+  }
+
+  /* Sunset dark */
+  .sunset-dark {
+    --background: 20 30% 6%;
+    --foreground: 30 30% 95%;
+    --card: 20 30% 9%;
+    --card-foreground: 30 30% 95%;
+    --primary: 25 95% 55%;
+    --primary-foreground: 20 30% 6%;
+    --secondary: 20 40% 15%;
+    --secondary-foreground: 25 95% 60%;
+    --muted: 20 25% 12%;
+    --muted-foreground: 30 20% 60%;
+    --accent: 20 30% 16%;
+    --accent-foreground: 30 30% 95%;
+    --border: 20 25% 18%;
+    --input: 20 25% 18%;
+    --ring: 25 95% 55%;
+    --sidebar: 20 30% 7%;
+    --sidebar-border: 20 25% 15%;
+  }
+
+  /* ==========================================
+     OCEAN THEME
+     Cool blues and teals, calming
+     ========================================== */
+  .ocean {
+    --background: 200 30% 97%;
+    --foreground: 210 50% 12%;
+    --card: 200 40% 99%;
+    --card-foreground: 210 50% 12%;
+    --popover: 200 40% 99%;
+    --popover-foreground: 210 50% 12%;
+    --primary: 200 80% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 50% 88%;
+    --secondary-foreground: 200 60% 25%;
+    --muted: 200 20% 93%;
+    --muted-foreground: 210 20% 45%;
+    --accent: 190 40% 90%;
+    --accent-foreground: 210 50% 12%;
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 25% 85%;
+    --input: 200 25% 85%;
+    --ring: 200 80% 45%;
+    --chart-1: 200 80% 45%;
+    --chart-2: 180 60% 50%;
+    --chart-3: 220 70% 55%;
+    --chart-4: 170 50% 50%;
+    --chart-5: 210 80% 40%;
+    --sidebar: 200 25% 96%;
+    --sidebar-foreground: 210 50% 15%;
+    --sidebar-border: 200 20% 88%;
+  }
+
+  /* Ocean dark */
+  .ocean-dark {
+    --background: 210 40% 6%;
+    --foreground: 200 25% 95%;
+    --card: 210 40% 9%;
+    --card-foreground: 200 25% 95%;
+    --primary: 195 90% 50%;
+    --primary-foreground: 210 40% 6%;
+    --secondary: 210 35% 15%;
+    --secondary-foreground: 195 90% 55%;
+    --muted: 210 30% 12%;
+    --muted-foreground: 200 20% 60%;
+    --accent: 210 35% 16%;
+    --accent-foreground: 200 25% 95%;
+    --border: 210 30% 18%;
+    --input: 210 30% 18%;
+    --ring: 195 90% 50%;
+    --sidebar: 210 40% 7%;
+    --sidebar-border: 210 30% 15%;
+  }
+
+  /* ==========================================
+     BASE STYLES
+     ========================================== */
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================
+   COMPONENT STYLES
+   ========================================== */
+@layer components {
+  /* Glass morphism card */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-xl;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
+  }
+
+  /* Glowing border */
+  .glow-border {
+    @apply relative;
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3);
+  }
+
+  /* Animated gradient background */
+  .animated-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--secondary)) 50%,
+      hsl(var(--primary)) 100%
+    );
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Pulse glow */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 20px hsl(var(--primary) / 0.6); }
+  }
+
+  /* Status badges */
+  .status-success {
+    @apply bg-[hsl(var(--success)_/_0.15)] text-[hsl(var(--success))] border-[hsl(var(--success)_/_0.3)];
+  }
+
+  .status-warning {
+    @apply bg-[hsl(var(--warning)_/_0.15)] text-[hsl(var(--warning))] border-[hsl(var(--warning)_/_0.3)];
+  }
+
+  .status-info {
+    @apply bg-[hsl(var(--info)_/_0.15)] text-[hsl(var(--info))] border-[hsl(var(--info)_/_0.3)];
+  }
+}
+
+/* ==========================================
+   SCROLLBAR STYLES
+   ========================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 10px;
+  border: 2px solid hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Dark scrollbar */
+.dark ::-webkit-scrollbar-track,
+.purple-hollow-dark ::-webkit-scrollbar-track,
+.sunset-dark ::-webkit-scrollbar-track,
+.ocean-dark ::-webkit-scrollbar-track,
+.monochrome-dark ::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+.dark ::-webkit-scrollbar-thumb,
+.purple-hollow-dark ::-webkit-scrollbar-thumb,
+.sunset-dark ::-webkit-scrollbar-thumb,
+.ocean-dark ::-webkit-scrollbar-thumb,
+.monochrome-dark ::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-color: hsl(var(--background));
+}
+
+/* ==========================================
+   SELECTION STYLES
+   ========================================== */
+::selection {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
+
+/* ==========================================
+   FOCUS STYLES
+   ========================================== */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disable transitions on page load */
+.no-transitions * {
+  transition: none !important;
+}
+
+/* ==========================================
+   TOOLTIP & MENU ANIMATIONS
+   ========================================== */
+.tooltip-content {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.tooltip-content-wrapper {
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+  animation: fadeIn 150ms ease-out;
+}
+
+.tooltip-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-state='closed'] {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+[data-state='open'] {
+  opacity: 1;
+  transition: opacity 150ms ease-out, width 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes tooltipSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.tooltip-content.slide-in {
+  animation: tooltipSlideIn 150ms ease-out;
+}
+
+.tooltip-content.slide-out {
+  animation: tooltipSlideOut 150ms ease-out;
+}
+
+.tooltip-animation {
+  animation: fadeIn 0.3s ease-in-out, slideIn 0.3s ease-in-out;
+}
+
+/* ==========================================
+   COMMAND PALETTE STYLES
+   ========================================== */
+.command-palette-backdrop {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.command-palette-container {
+  animation: scaleIn 0.15s ease-out;
+}
+
+/* Highlight matching text in search */
+.command-highlight {
+  background: hsl(var(--primary) / 0.2);
+  border-radius: 2px;
+  padding: 0 2px;
 }
