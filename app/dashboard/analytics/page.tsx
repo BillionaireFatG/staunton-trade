@@ -72,13 +72,13 @@ const regionData = [
 ];
 
 const weeklyTrends = [
-  { day: 'Mon', current: 12500, previous: 11000 },
-  { day: 'Tue', current: 14200, previous: 12500 },
-  { day: 'Wed', current: 11800, previous: 13200 },
-  { day: 'Thu', current: 15600, previous: 14100 },
-  { day: 'Fri', current: 18200, previous: 15800 },
-  { day: 'Sat', current: 8500, previous: 7200 },
-  { day: 'Sun', current: 6200, previous: 5100 },
+  { name: 'Mon', current: 12500, previous: 11000 },
+  { name: 'Tue', current: 14200, previous: 12500 },
+  { name: 'Wed', current: 11800, previous: 13200 },
+  { name: 'Thu', current: 15600, previous: 14100 },
+  { name: 'Fri', current: 18200, previous: 15800 },
+  { name: 'Sat', current: 8500, previous: 7200 },
+  { name: 'Sun', current: 6200, previous: 5100 },
 ];
 
 const performanceMetrics = [
@@ -350,7 +350,7 @@ export default function AnalyticsPage() {
                 { key: 'current', color: CHART_COLORS.info, name: 'This Week' },
                 { key: 'previous', color: CHART_COLORS.purple, name: 'Last Week', dashed: true },
               ]}
-              xAxisKey="day"
+              xAxisKey="name"
               height={280}
               formatter={(value) => formatVolume(value)}
             />
