@@ -91,7 +91,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error fetching current profile:', error);
+    // Error fetching current profile
     return null;
   }
 }
@@ -110,7 +110,7 @@ export async function getPublicProfile(userId: string): Promise<Profile | null> 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error fetching public profile:', error);
+    // Error fetching public profile
     return null;
   }
 }
@@ -132,7 +132,7 @@ export async function createProfile(userId: string, profileData: Partial<Profile
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error creating profile:', error);
+    // Error creating profile
     return null;
   }
 }
@@ -155,7 +155,7 @@ export async function updateProfile(userId: string, updates: Partial<Profile>): 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error updating profile:', error);
+    // Error updating profile
     return null;
   }
 }
@@ -174,7 +174,7 @@ export async function searchProfiles(query: string, limit = 20): Promise<Profile
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error searching profiles:', error);
+    // Error searching profiles
     return [];
   }
 }
@@ -194,7 +194,7 @@ export async function getVerifiedProfiles(limit = 50): Promise<Profile[]> {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching verified profiles:', error);
+    // Error fetching verified profiles
     return [];
   }
 }
@@ -223,7 +223,7 @@ export async function uploadAvatar(userId: string, file: File): Promise<string |
     const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
     return data.publicUrl;
   } catch (error) {
-    console.error('Error uploading avatar:', error);
+    // Error uploading avatar
     return null;
   }
 }
@@ -244,7 +244,7 @@ export async function deleteAvatar(avatarUrl: string): Promise<boolean> {
     if (error) throw error;
     return true;
   } catch (error) {
-    console.error('Error deleting avatar:', error);
+    // Error deleting avatar
     return false;
   }
 }
@@ -272,7 +272,7 @@ export async function uploadVerificationDocs(userId: string, files: File[]): Pro
 
     return uploadedUrls;
   } catch (error) {
-    console.error('Error uploading verification docs:', error);
+    // Error uploading verification docs
     return uploadedUrls;
   }
 }
@@ -307,7 +307,7 @@ export async function requestVerification(userId: string, documents: string[]): 
     if (updateError) throw updateError;
     return true;
   } catch (error) {
-    console.error('Error requesting verification:', error);
+    // Error requesting verification
     return false;
   }
 }
@@ -336,7 +336,7 @@ export async function sendGlobalMessage(senderId: string, content: string): Prom
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error sending global message:', error);
+    // Error sending global message
     return null;
   }
 }
@@ -358,7 +358,7 @@ export async function getGlobalMessages(limit = 100): Promise<GlobalMessage[]> {
     if (error) throw error;
     return (data || []).reverse();
   } catch (error) {
-    console.error('Error fetching global messages:', error);
+    // Error fetching global messages
     return [];
   }
 }
@@ -381,7 +381,7 @@ export async function getOlderGlobalMessages(beforeTimestamp: string, limit = 50
     if (error) throw error;
     return (data || []).reverse();
   } catch (error) {
-    console.error('Error fetching older global messages:', error);
+    // Error fetching older global messages
     return [];
   }
 }
@@ -433,7 +433,7 @@ export async function deleteGlobalMessage(messageId: string, userId: string): Pr
     if (error) throw error;
     return true;
   } catch (error) {
-    console.error('Error deleting global message:', error);
+    // Error deleting global message
     return false;
   }
 }
@@ -455,7 +455,7 @@ export async function getOnlineUsersCount(): Promise<number> {
     const uniqueSenders = new Set((data || []).map(m => m.sender_id));
     return uniqueSenders.size;
   } catch (error) {
-    console.error('Error getting online users count:', error);
+    // Error getting online users count
     return 0;
   }
 }
@@ -492,7 +492,7 @@ export async function getGlobalChatStats(): Promise<{
       messagesLast24h: messagesLast24h || 0,
     };
   } catch (error) {
-    console.error('Error getting global chat stats:', error);
+    // Error getting global chat stats
     return {
       totalMessages: 0,
       activeUsers: 0,
@@ -527,7 +527,7 @@ export async function getOrCreateConversation(user1Id: string, user2Id: string):
     if (createError) throw createError;
     return newConv?.id || null;
   } catch (error) {
-    console.error('Error getting/creating conversation:', error);
+    // Error getting/creating conversation
     return null;
   }
 }
@@ -546,7 +546,7 @@ export async function sendMessage(conversationId: string, senderId: string, cont
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error sending message:', error);
+    // Error sending message
     return null;
   }
 }
@@ -563,7 +563,7 @@ export async function markAsRead(conversationId: string, userId: string): Promis
       .neq('sender_id', userId)
       .eq('read', false);
   } catch (error) {
-    console.error('Error marking messages as read:', error);
+    // Error marking messages as read
   }
 }
 
@@ -614,7 +614,7 @@ export async function getConversations(userId: string): Promise<Conversation[]> 
 
     return conversationsWithData;
   } catch (error) {
-    console.error('Error fetching conversations:', error);
+    // Error fetching conversations
     return [];
   }
 }
@@ -637,7 +637,7 @@ export async function getMessages(conversationId: string, limit = 50): Promise<M
     if (error) throw error;
     return (data || []).reverse();
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    // Error fetching messages
     return [];
   }
 }
@@ -650,7 +650,7 @@ export async function getTotalUnreadCount(userId: string): Promise<number> {
     const conversations = await getConversations(userId);
     return conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
   } catch (error) {
-    console.error('Error getting unread count:', error);
+    // Error getting unread count
     return 0;
   }
 }
