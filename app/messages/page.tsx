@@ -3,13 +3,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { supabase } from '@/lib/supabase';
-import { getConversations, getMessages, sendMessage, markAsRead } from '@/lib/supabase/chat';
+import { getConversations, getMessages, sendMessage, markAsRead, type Conversation, type Message } from '@/lib/supabase/master-helpers';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Send, Loader2 } from 'lucide-react';
-import type { Conversation, Message } from '@/types/profile';
 
 export default function MessagesPage() {
   const { user } = useAuth();
