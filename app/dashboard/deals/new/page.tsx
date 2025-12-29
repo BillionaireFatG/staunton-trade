@@ -8,13 +8,6 @@ import type { DealInsert } from '@/types/database';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   ArrowLeft, 
@@ -166,24 +159,22 @@ export default function NewDealPage() {
               <Label htmlFor="commodity_type" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
                 Commodity Type <span className="text-red-500">*</span>
               </Label>
-              <div className="border border-input rounded-md">
-                <Select
-                  value={formData.commodity_type}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, commodity_type: value }))}
-                  disabled={loading}
-                >
-                  <SelectTrigger className="!w-full h-10 border-0">
-                    <SelectValue placeholder="Select commodity type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Diesel">Diesel</SelectItem>
-                    <SelectItem value="Jet Fuel">Jet Fuel</SelectItem>
-                    <SelectItem value="Gasoline">Gasoline</SelectItem>
-                    <SelectItem value="Crude Oil">Crude Oil</SelectItem>
-                    <SelectItem value="LNG">LNG</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <select
+                id="commodity_type"
+                name="commodity_type"
+                value={formData.commodity_type}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Select commodity type</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Jet Fuel">Jet Fuel</option>
+                <option value="Gasoline">Gasoline</option>
+                <option value="Crude Oil">Crude Oil</option>
+                <option value="LNG">LNG</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
