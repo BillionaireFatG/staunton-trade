@@ -166,22 +166,24 @@ export default function NewDealPage() {
               <Label htmlFor="commodity_type" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
                 Commodity Type <span className="text-red-500">*</span>
               </Label>
-              <Select
-                value={formData.commodity_type}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, commodity_type: value }))}
-                disabled={loading}
-              >
-                <SelectTrigger className="!w-full h-10 bg-background border-input">
-                  <SelectValue placeholder="Select commodity type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Diesel">Diesel</SelectItem>
-                  <SelectItem value="Jet Fuel">Jet Fuel</SelectItem>
-                  <SelectItem value="Gasoline">Gasoline</SelectItem>
-                  <SelectItem value="Crude Oil">Crude Oil</SelectItem>
-                  <SelectItem value="LNG">LNG</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="border border-input rounded-md">
+                <Select
+                  value={formData.commodity_type}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, commodity_type: value }))}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="!w-full h-10 border-0">
+                    <SelectValue placeholder="Select commodity type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Diesel">Diesel</SelectItem>
+                    <SelectItem value="Jet Fuel">Jet Fuel</SelectItem>
+                    <SelectItem value="Gasoline">Gasoline</SelectItem>
+                    <SelectItem value="Crude Oil">Crude Oil</SelectItem>
+                    <SelectItem value="LNG">LNG</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
