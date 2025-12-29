@@ -52,7 +52,8 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
 
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/dashboard/messages', icon: MessageSquare, label: 'Messages' },
+    { href: '/global-chat', icon: MessageSquare, label: 'Global Chat' },
+    { href: '/messages', icon: MessageSquare, label: 'Messages' },
     { href: '/dashboard/deals', icon: Briefcase, label: 'Deals' },
     { href: '/dashboard/counterparties', icon: Users, label: 'Counterparties' },
     { href: '/dashboard/lifecycle', icon: Clock, label: 'Lifecycle' },
