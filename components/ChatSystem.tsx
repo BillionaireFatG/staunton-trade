@@ -798,7 +798,7 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
                         {showAvatar && (
                           <div className={cn('flex items-center gap-2', isOwn ? 'flex-row-reverse' : '')}>
                             <span className="text-xs font-semibold">{msg.sender?.full_name || 'Unknown'}</span>
-                            {msg.sender?.verification_status === 'verified' && <VerificationBadge size="sm" />}
+                            {msg.sender?.verification_status === 'verified' && <VerificationBadge verified={true} size="sm" />}
                           </div>
                         )}
                         <div className={cn(
