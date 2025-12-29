@@ -171,7 +171,7 @@ export default function NewDealPage() {
                 onValueChange={(value) => setFormData(prev => ({ ...prev, commodity_type: value }))}
                 disabled={loading}
               >
-                <SelectTrigger className="!w-full h-10">
+                <SelectTrigger className="!w-full h-10 bg-background border-input">
                   <SelectValue placeholder="Select commodity type" />
                 </SelectTrigger>
                 <SelectContent>
