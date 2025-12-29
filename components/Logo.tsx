@@ -9,48 +9,35 @@ interface LogoProps {
   variant?: 'light' | 'dark' | 'auto';
 }
 
-export function Logo({ size = 'md', showText = true, className = '', variant = 'auto' }: LogoProps) {
+export function Logo({ size = 'md', showText = false, className = '', variant = 'auto' }: LogoProps) {
   const sizes = {
-    sm: { logo: 28, text: 'text-sm' },
-    md: { logo: 36, text: 'text-lg' },
-    lg: { logo: 48, text: 'text-xl' },
-    xl: { logo: 64, text: 'text-2xl' },
+    sm: { logo: 48, text: 'text-sm' },
+    md: { logo: 62, text: 'text-lg' },
+    lg: { logo: 82, text: 'text-xl' },
+    xl: { logo: 125, text: 'text-2xl' },
   };
 
-  const { logo, text } = sizes[size];
+  const { logo } = sizes[size];
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-3 ${className}`}>
       <div 
-        className="relative flex-shrink-0"
+        className="relative flex-shrink-0 rounded-xl overflow-hidden"
         style={{ width: logo, height: logo }}
       >
         <Image
-          src="/logo.png"
+          src="/logo5.png"
           alt="Staunton Trade"
           fill
-          className="object-contain"
+          className="object-cover"
+          style={{ color: 'rgba(253, 252, 252, 0)' }}
+          quality={60}
           priority
         />
       </div>
-      {showText && (
-        <div className="flex flex-col leading-none">
-          <span className={`font-bold tracking-tight ${text} ${
-            variant === 'light' ? 'text-white' : 
-            variant === 'dark' ? 'text-neutral-900' : 
-            'text-foreground'
-          }`}>
-            STAUNTON
-          </span>
-          <span className={`font-light tracking-[0.25em] text-[0.6em] ${
-            variant === 'light' ? 'text-white/80' : 
-            variant === 'dark' ? 'text-neutral-600' : 
-            'text-muted-foreground'
-          }`}>
-            TRADE
-          </span>
-        </div>
-      )}
+      <span className={`font-bold text-neutral-900 ${sizes[size].text}`}>
+        STAUNTON TRADE
+      </span>
     </div>
   );
 }
@@ -59,17 +46,20 @@ export function Logo({ size = 'md', showText = true, className = '', variant = '
 export function LogoIcon({ size = 32, className = '' }: { size?: number; className?: string }) {
   return (
     <div 
-      className={`relative flex-shrink-0 ${className}`}
+      className={`relative flex-shrink-0 rounded-xl overflow-hidden ${className}`}
       style={{ width: size, height: size }}
     >
       <Image
-        src="/logo.png"
+        src="/logo5.png"
         alt="Staunton Trade"
         fill
-        className="object-contain"
+        className="object-cover"
+        style={{ color: 'rgba(253, 252, 252, 0)' }}
+        quality={60}
         priority
       />
     </div>
   );
 }
+
 

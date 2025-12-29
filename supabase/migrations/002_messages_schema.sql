@@ -100,3 +100,4 @@ GRANT EXECUTE ON FUNCTION get_unread_message_count TO authenticated;
 GRANT EXECUTE ON FUNCTION get_unread_count_by_partner TO authenticated;
 GRANT EXECUTE ON FUNCTION mark_conversation_as_read TO authenticated;
 
+

@@ -1,41 +1,24 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { Onboarding } from '@/components/Onboarding';
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { Logo } from '@/components/Logo';
+import OnboardingForm from './OnboardingForm';
 
 export default function OnboardingPage() {
-  const router = useRouter();
-  const [userEmail, setUserEmail] = useState('');
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
-        setUserEmail(user.email);
-      }
-    };
-    getUser();
-  }, []);
-
-  const handleComplete = () => {
-    // In production, save onboarding completion status
-    localStorage.setItem('onboarding_complete', 'true');
-    router.push('/dashboard');
-  };
-
-  const handleSkip = () => {
-    localStorage.setItem('onboarding_complete', 'true');
-    router.push('/dashboard');
-  };
-
   return (
-    <Onboarding 
-      userEmail={userEmail}
-      onComplete={handleComplete}
-      onSkip={handleSkip}
-    />
+    <div className="min-h-screen bg-white flex flex-col">
+      <header className="flex items-center justify-between p-4 border-b border-neutral-200">
+        <Logo size="sm" variant="dark" />
+      </header>
+
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Complete Your Profile</h1>
+            <p className="text-neutral-600">Tell us about yourself to get started on Staunton Trade</p>
+          </div>
+          
+          <OnboardingForm />
+        </div>
+      </main>
+    </div>
   );
 }
 

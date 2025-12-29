@@ -28,12 +28,17 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Allow auth callback and onboarding routes to proceed without checks
+  if (pathname === '/auth/callback' || pathname === '/onboarding') {
+    return response;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   // Protected routes
-  if (pathname.startsWith('/dashboard')) {
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile') || pathname.startsWith('/messages')) {
     if (!user) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/sign-in';
@@ -44,8 +49,19 @@ export async function middleware(request: NextRequest) {
   // Redirect authenticated users away from auth pages
   if (pathname === '/sign-in' || pathname === '/sign-up') {
     if (user) {
+      // Check if profile is complete
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('id', user.id)
+        .single();
+
       const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/dashboard';
+      if (!profile || !profile.full_name) {
+        redirectUrl.pathname = '/onboarding';
+      } else {
+        redirectUrl.pathname = '/dashboard';
+      }
       return NextResponse.redirect(redirectUrl);
     }
   }

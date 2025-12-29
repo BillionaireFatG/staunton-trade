@@ -1,32 +1,33 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, Globe, Shield } from 'lucide-react';
+import { AlertCircle, Clock, DollarSign, FileX } from 'lucide-react';
+import Image from 'next/image';
 
 const stats = [
   {
-    icon: TrendingUp,
-    value: '$2B+',
-    label: 'Trade Volume',
-    description: 'Total transaction value processed',
+    icon: DollarSign,
+    value: '$1.6T',
+    label: 'Annual Fraud Loss in Trade',
+    description: 'Lack of verification systems',
   },
   {
-    icon: Users,
-    value: '10K+',
-    label: 'Active Users',
-    description: 'Verified professionals',
+    icon: Clock,
+    value: '5-21 Days',
+    label: 'Average Transaction Wait Time',
+    description: 'Manual verification delays',
   },
   {
-    icon: Globe,
-    value: '50+',
-    label: 'Countries',
-    description: 'Global market reach',
+    icon: FileX,
+    value: '$150K+',
+    label: 'Average Document Issuance Cost Per Transaction',
+    description: 'Paper-based inefficiency',
   },
   {
-    icon: Shield,
-    value: '99.9%',
-    label: 'Uptime',
-    description: 'Enterprise reliability',
+    icon: AlertCircle,
+    value: '75 Hours',
+    label: 'Average Port Wait Time',
+    description: 'Documentation bottlenecks',
   },
 ];
 
@@ -39,13 +40,13 @@ export default function Stats() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Industry-Leading Performance
+            Global Commodity Inefficiencies
           </h2>
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-            Trusted by commodity professionals worldwide
+            That reduce trust in commodity markets
           </p>
         </motion.div>
 
@@ -56,7 +57,7 @@ export default function Stats() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.6, delay: index * 0.1 + 0.3 }}
               className="text-center p-8 rounded-2xl bg-neutral-800/50 border border-neutral-700"
             >
               <div className="w-14 h-14 rounded-xl bg-neutral-700 flex items-center justify-center mx-auto mb-4">

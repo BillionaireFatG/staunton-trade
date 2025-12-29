@@ -478,7 +478,8 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
 
         setConversations(Array.from(conversationMap.values()));
       } catch (error) {
-        console.error('Error fetching conversations:', error);
+        // Silently handle - table might not exist yet
+        setConversations([]);
       }
       setLoading(false);
     };

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Globe, Zap } from 'lucide-react';
+import { ArrowRight, Shield, Globe, Zap, Clock, DollarSign, TrendingUp, Lock } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Lazy load the globe for better performance
@@ -88,24 +88,41 @@ export default function Hero() {
 
             {/* Stats */}
             <motion.div 
-              className="flex gap-8 sm:gap-12"
+              className="flex gap-6 sm:gap-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
             >
               <div>
-                <div className="text-3xl font-bold text-neutral-900">10K+</div>
-                <div className="text-sm text-neutral-500 mt-1">Active Users</div>
+                <div className="flex items-center gap-1.5">
+                  <Clock size={16} className="text-neutral-900" />
+                  <span className="text-2xl font-bold text-neutral-900">70%</span>
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Transaction Timeline</div>
               </div>
               <div className="w-px bg-neutral-200" />
               <div>
-                <div className="text-3xl font-bold text-neutral-900">50K+</div>
-                <div className="text-sm text-neutral-500 mt-1">Documents</div>
+                <div className="flex items-center gap-1.5">
+                  <DollarSign size={16} className="text-neutral-900" />
+                  <span className="text-2xl font-bold text-neutral-900">60%</span>
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Cost Reduction</div>
               </div>
               <div className="w-px bg-neutral-200" />
               <div>
-                <div className="text-3xl font-bold text-neutral-900">$2B+</div>
-                <div className="text-sm text-neutral-500 mt-1">Trade Volume</div>
+                <div className="flex items-center gap-1.5">
+                  <TrendingUp size={16} className="text-neutral-900" />
+                  <span className="text-2xl font-bold text-neutral-900">65%</span>
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Schedule Efficiency</div>
+              </div>
+              <div className="w-px bg-neutral-200" />
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <Lock size={16} className="text-neutral-900" />
+                  <span className="text-2xl font-bold text-neutral-900">99%</span>
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Fraud Prevention</div>
               </div>
             </motion.div>
           </div>
@@ -120,27 +137,15 @@ export default function Hero() {
             <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-neutral-50 to-neutral-100 border border-neutral-200 shadow-2xl shadow-neutral-200/50">
               <CommodityGlobe className="w-full" />
               
-              {/* Floating cards */}
+              {/* Floating card */}
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 1 }}
-                className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-neutral-200"
+                className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-md p-2 shadow-lg border border-neutral-200"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs font-medium text-neutral-700">Live Trading</span>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-neutral-200"
-              >
-                <div className="text-xs text-neutral-500">Active Hotspots</div>
-                <div className="text-lg font-bold text-neutral-900">15 Locations</div>
+                <div className="text-[10px] text-neutral-500">Active Hotspots</div>
+                <div className="text-sm font-bold text-neutral-900">15 Locations</div>
               </motion.div>
             </div>
           </motion.div>

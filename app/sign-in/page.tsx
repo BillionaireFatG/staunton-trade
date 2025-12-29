@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 
 export default function SignIn() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +16,13 @@ export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check for error from callback
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'verification_failed') {
+      setError('Email verification failed. Please try signing in or request a new verification email.');
+    }
+
+    // Check existing session
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -21,7 +30,20 @@ export default function SignIn() {
       }
     };
     checkSession();
-  }, []);
+
+    // Listen to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          window.location.href = '/dashboard';
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +63,18 @@ export default function SignIn() {
       }
 
       if (data.user) {
-        window.location.href = '/dashboard';
+        // Check if profile exists and is complete
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .eq('id', data.user.id)
+          .single();
+
+        if (!profile || !profile.full_name) {
+          window.location.href = '/onboarding';
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
         setError('Sign in succeeded but no user was returned. Please try again.');
         setLoading(false);

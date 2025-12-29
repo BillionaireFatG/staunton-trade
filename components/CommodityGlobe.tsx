@@ -154,6 +154,8 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const animationRef = useRef<number | undefined>(undefined);
+  const lastRenderTime = useRef<number>(0);
+  const renderThrottle = 16; // ~60fps for smoother rendering
 
   const width = 800;
   const height = 600;
@@ -180,7 +182,7 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
     loadWorldData();
   }, []);
 
-  // Auto-rotation
+  // Auto-rotation with smooth animation
   useEffect(() => {
     if (!isAutoRotating || isDragging || isAnimating) {
       if (animationRef.current) {
@@ -189,8 +191,15 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       return;
     }
 
-    const animate = () => {
-      setRotation(prev => [(prev[0] + 0.15) % 360, prev[1]]);
+    let lastTime = performance.now();
+    const fps = 60; // Back to 60fps for smoothness
+    const interval = 1000 / fps;
+
+    const animate = (currentTime: number) => {
+      if (currentTime - lastTime >= interval) {
+        setRotation(prev => [(prev[0] + 0.2) % 360, prev[1]]); // Smaller, smoother steps
+        lastTime = currentTime;
+      }
       animationRef.current = requestAnimationFrame(animate);
     };
 
@@ -234,9 +243,16 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
     setIsDragging(false);
   };
 
-  // Main visualization
+  // Main visualization with throttling
   useEffect(() => {
     if (!svgRef.current || worldData.length === 0) return;
+
+    // Throttle rendering for better performance
+    const now = Date.now();
+    if (now - lastRenderTime.current < renderThrottle && !isAnimating) {
+      return;
+    }
+    lastRenderTime.current = now;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
@@ -249,7 +265,7 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       .scale(scale(alpha))
       .translate([width / 2, height / 2])
       .rotate([rotation[0], rotation[1]])
-      .precision(0.1);
+      .precision(0.5); // Reduced precision for better performance
 
     projection.alpha(alpha);
 
@@ -299,21 +315,21 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
         .attr('stroke-width', 1.5);
     }
 
-    // Graticule
+    // Graticule - simplified for performance
     try {
-      const graticule = d3.geoGraticule();
+      const graticule = d3.geoGraticule().step([20, 20]); // Larger steps for fewer lines
       const graticulePath = path(graticule());
       if (graticulePath) {
         svg.append('path')
           .datum(graticule())
           .attr('d', graticulePath)
           .attr('fill', 'none')
-          .attr('stroke', 'hsl(var(--muted-foreground) / 0.15)')
-          .attr('stroke-width', 0.5);
+          .attr('stroke', 'hsl(var(--muted-foreground) / 0.1)')
+          .attr('stroke-width', 0.3);
       }
     } catch (error) {}
 
-    // Countries
+    // Countries - simplified for performance
     svg.selectAll('.country')
       .data(worldData)
       .enter()
@@ -328,16 +344,9 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
           return '';
         }
       })
-      .attr('fill', 'hsl(var(--muted) / 0.6)')
+      .attr('fill', 'hsl(var(--muted) / 0.5)')
       .attr('stroke', 'hsl(var(--border))')
-      .attr('stroke-width', 0.5)
-      .style('transition', 'fill 0.3s ease')
-      .on('mouseenter', function() {
-        d3.select(this).attr('fill', 'hsl(var(--accent))');
-      })
-      .on('mouseleave', function() {
-        d3.select(this).attr('fill', 'hsl(var(--muted) / 0.6)');
-      });
+      .attr('stroke-width', 0.3);
 
     // Trade routes
     TRADE_ROUTES.forEach(route => {
@@ -362,42 +371,25 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
 
       if (!fromVisible && !toVisible) return;
 
-      // Create curved path
+      // Create curved path - simplified for performance
       const midX = (fromCoords[0] + toCoords[0]) / 2;
       const midY = (fromCoords[1] + toCoords[1]) / 2 - 40;
       
-      const routePath = svg.append('path')
+      svg.append('path')
         .attr('d', `M ${fromCoords[0]} ${fromCoords[1]} Q ${midX} ${midY} ${toCoords[0]} ${toCoords[1]}`)
         .attr('fill', 'none')
         .attr('stroke', route.active ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)')
-        .attr('stroke-width', route.active ? 2 : 1)
-        .attr('stroke-dasharray', route.active ? '8,4' : '4,4')
-        .attr('opacity', fromVisible && toVisible ? 0.7 : 0.3);
-
-      // Animated dash for active routes
-      if (route.active) {
-        const pathLength = routePath.node()?.getTotalLength() || 0;
-        routePath
-          .attr('stroke-dasharray', `${pathLength}`)
-          .attr('stroke-dashoffset', pathLength)
-          .transition()
-          .duration(2000)
-          .ease(d3.easeLinear)
-          .attr('stroke-dashoffset', 0)
-          .on('end', function repeat() {
-            d3.select(this)
-              .attr('stroke-dashoffset', pathLength)
-              .transition()
-              .duration(2000)
-              .ease(d3.easeLinear)
-              .attr('stroke-dashoffset', 0)
-              .on('end', repeat);
-          });
-      }
+        .attr('stroke-width', route.active ? 1.5 : 0.8)
+        .attr('stroke-dasharray', route.active ? '5,3' : '3,3')
+        .attr('opacity', fromVisible && toVisible ? 0.5 : 0.2);
+      
+      // Removed continuous animation for better performance
     });
 
-    // Hotspots
-    COMMODITY_HOTSPOTS.forEach((spot) => {
+    // Hotspots - limit to top 25 for performance
+    const visibleHotspots = COMMODITY_HOTSPOTS.slice(0, 25);
+    
+    visibleHotspots.forEach((spot) => {
       const coords = projection([spot.lon, spot.lat]);
       if (!coords) return;
 
@@ -419,32 +411,16 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
           onHotspotClick?.(spot);
         });
 
-      // Pulse animation ring
-      group.append('circle')
-        .attr('r', 12)
-        .attr('fill', 'none')
-        .attr('stroke', spot.color)
-        .attr('stroke-width', 2)
-        .attr('opacity', 0.5)
-        .append('animate')
-        .attr('attributeName', 'r')
-        .attr('from', '6')
-        .attr('to', '20')
-        .attr('dur', '2s')
-        .attr('repeatCount', 'indefinite');
-
-      group.append('circle')
-        .attr('r', 12)
-        .attr('fill', 'none')
-        .attr('stroke', spot.color)
-        .attr('stroke-width', 2)
-        .attr('opacity', 0)
-        .append('animate')
-        .attr('attributeName', 'opacity')
-        .attr('from', '0.8')
-        .attr('to', '0')
-        .attr('dur', '2s')
-        .attr('repeatCount', 'indefinite');
+      // Simplified pulse animation - removed for performance
+      // Only show pulse for selected hotspot
+      if (selectedHotspot?.id === spot.id) {
+        group.append('circle')
+          .attr('r', 15)
+          .attr('fill', 'none')
+          .attr('stroke', spot.color)
+          .attr('stroke-width', 2)
+          .attr('opacity', 0.4);
+      }
 
       // Main dot
       group.append('circle')
@@ -566,13 +542,17 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        style={{
+          willChange: isDragging ? 'transform' : 'auto',
+          transform: 'translateZ(0)', // Force hardware acceleration
+        }}
       />
 
       {/* Legend */}
-      <div className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3 space-y-2">
-        <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-          <Globe2 size={14} className="text-primary" />
-          Commodity Hotspots
+      <div className="absolute top-4 left-4 bg-card/95 backdrop-blur-sm border border-border rounded-md p-3 space-y-2 shadow-lg">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+          <Globe2 size={12} className="text-primary" />
+          Live Trading Hotspots
         </div>
         <div className="grid grid-cols-2 gap-1.5">
           {[
@@ -582,8 +562,8 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
             { type: 'refinery', label: 'Refinery', color: '#06b6d4' },
           ].map(item => (
             <div key={item.type} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-              {item.label}
+              <span className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
+              <span className="font-medium">{item.label}</span>
             </div>
           ))}
         </div>
@@ -591,33 +571,33 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
 
       {/* Selected Hotspot Info */}
       {selectedHotspot && (
-        <div className="absolute top-4 right-4 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-4 w-64 shadow-xl">
-          <div className="flex items-start justify-between mb-3">
+        <div className="absolute top-6 right-6 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-5 w-72 shadow-xl">
+          <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="font-semibold text-foreground">{selectedHotspot.name}</h3>
-              <p className="text-xs text-muted-foreground">{selectedHotspot.country}</p>
+              <h3 className="text-lg font-semibold text-foreground">{selectedHotspot.name}</h3>
+              <p className="text-sm text-muted-foreground">{selectedHotspot.country}</p>
             </div>
             <Badge 
               variant="secondary" 
-              className="text-[10px]"
+              className="text-xs px-2 py-1"
               style={{ backgroundColor: `${selectedHotspot.color}20`, color: selectedHotspot.color }}
             >
               {selectedHotspot.type}
             </Badge>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm">
-              <Fuel size={14} className="text-muted-foreground" />
-              <span className="text-foreground">{selectedHotspot.commodity}</span>
+              <Fuel size={16} className="text-muted-foreground" />
+              <span className="text-foreground font-medium">{selectedHotspot.commodity}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <TrendingUp size={14} className="text-muted-foreground" />
-              <span className="text-foreground">{selectedHotspot.volume}</span>
+              <TrendingUp size={16} className="text-muted-foreground" />
+              <span className="text-foreground font-medium">{selectedHotspot.volume}</span>
             </div>
           </div>
           <button 
             onClick={() => setSelectedHotspot(null)}
-            className="mt-3 w-full py-1.5 text-xs text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-accent transition-colors"
+            className="mt-4 w-full py-2 text-sm text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-accent transition-colors font-medium"
           >
             Close
           </button>
@@ -625,25 +605,34 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       )}
 
       {/* Controls */}
-      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+      <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <Button
             onClick={() => setIsAutoRotating(!isAutoRotating)}
             variant={isAutoRotating ? 'default' : 'outline'}
             size="sm"
-            className="h-8 text-xs"
+            className="h-9 text-sm px-4"
           >
             {isAutoRotating ? 'Pause Rotation' : 'Auto Rotate'}
           </Button>
         </div>
+        
+        {/* Active Trade Routes Count */}
+        <div className="bg-card/95 backdrop-blur-sm border border-border rounded-full px-4 py-2 flex items-center gap-2 shadow-lg">
+          <Zap size={14} className="text-primary animate-pulse" />
+          <span className="text-sm font-medium text-foreground">
+            {TRADE_ROUTES.filter(r => r.active).length} Active Routes
+          </span>
+        </div>
+        
         <div className="flex items-center gap-2">
           <Button
             onClick={handleAnimate}
             disabled={isAnimating}
             size="sm"
-            className="h-8 text-xs"
+            className="h-9 text-sm px-4"
           >
-            {isAnimating ? 'Transforming...' : progress === 0 ? 'Flatten to Map' : 'Form Globe'}
+            {isAnimating ? 'Transforming...' : progress === 0 ? 'Flatten' : 'Globe'}
           </Button>
           <Button
             onClick={() => {
@@ -653,19 +642,11 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
             }}
             variant="outline"
             size="sm"
-            className="h-8 text-xs"
+            className="h-9 text-sm px-4"
           >
             Reset
           </Button>
         </div>
-      </div>
-
-      {/* Active Trade Routes Count */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm border border-border rounded-full px-4 py-1.5 flex items-center gap-2">
-        <Zap size={12} className="text-primary animate-pulse" />
-        <span className="text-xs font-medium text-foreground">
-          {TRADE_ROUTES.filter(r => r.active).length} Active Trade Routes
-        </span>
       </div>
     </div>
   );

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/components/AuthProvider";
+import { ProfileProvider } from "@/components/ProfileProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -79,9 +81,13 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider defaultTheme="light" storageKey="staunton-theme">
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ProfileProvider>
+            <ThemeProvider defaultTheme="light" storageKey="staunton-theme">
+              {children}
+            </ThemeProvider>
+          </ProfileProvider>
+        </AuthProvider>
       </body>
     </html>
   );

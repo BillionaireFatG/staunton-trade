@@ -14,11 +14,24 @@ export default function CTA() {
   return (
     <section className="py-24 bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* One-liner */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900">
+            Fixing Trillion Dollar Markets
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="relative rounded-3xl bg-white p-8 md:p-12 lg:p-16 border border-neutral-200 shadow-xl"
         >
           <div className="grid lg:grid-cols-2 gap-12 items-center">

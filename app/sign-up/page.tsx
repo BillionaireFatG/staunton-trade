@@ -15,6 +15,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const isPasswordValid = password.length >= 6;
   const passwordsMatch = password === confirmPassword && password.length > 0;
@@ -37,9 +38,14 @@ export default function SignUp() {
     }
 
     try {
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
       });
 
       if (signUpError) {
@@ -49,14 +55,87 @@ export default function SignUp() {
       }
 
       if (data.user) {
-        router.push('/dashboard');
-        router.refresh();
+        // Check if email confirmation is required
+        if (data.user.identities && data.user.identities.length === 0) {
+          setError('This email is already registered. Please sign in instead.');
+          setLoading(false);
+          return;
+        }
+
+        // Create initial profile entry
+        await supabase.from('profiles').insert({
+          id: data.user.id,
+          email: data.user.email!,
+        });
+        
+        // If email confirmation is disabled or user is already confirmed
+        if (data.user.confirmed_at || data.session) {
+          router.push('/onboarding');
+          router.refresh();
+        } else {
+          // Email confirmation required
+          setSuccess(true);
+          setLoading(false);
+        }
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       setLoading(false);
     }
   };
+
+  // Show success message if email verification is required
+  if (success) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <header className="flex items-center justify-between p-4 border-b border-neutral-200">
+          <Link href="/">
+            <Logo size="sm" variant="dark" />
+          </Link>
+        </header>
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-md text-center">
+            <div className="mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check size={32} className="text-green-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-neutral-900 mb-2">Check your email</h1>
+              <p className="text-neutral-600">
+                We've sent a verification link to <strong>{email}</strong>
+              </p>
+            </div>
+            <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 text-left space-y-2">
+              <p className="text-sm text-neutral-700">
+                Click the link in the email to verify your account and get started.
+              </p>
+              <p className="text-sm text-neutral-500">
+                Didn't receive the email? Check your spam folder or{' '}
+                <button
+                  onClick={() => {
+                    setSuccess(false);
+                    setEmail('');
+                    setPassword('');
+                    setConfirmPassword('');
+                  }}
+                  className="text-neutral-900 font-medium hover:underline"
+                >
+                  try again
+                </button>
+              </p>
+            </div>
+            <div className="mt-6">
+              <Link
+                href="/sign-in"
+                className="text-sm text-neutral-900 font-medium hover:underline"
+              >
+                Back to sign in
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
