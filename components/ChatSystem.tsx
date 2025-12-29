@@ -16,7 +16,15 @@ import {
   ChevronLeft,
   User,
   Loader2,
+  Users,
 } from 'lucide-react';
+import { 
+  getGlobalMessages, 
+  sendGlobalMessage, 
+  subscribeToGlobalChat,
+  type GlobalMessage 
+} from '@/lib/supabase/master-helpers';
+import { VerificationBadge } from '@/components/profile/VerificationBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -414,6 +422,8 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
   const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(initialPartnerId || null);
   const [selectedPartner, setSelectedPartner] = React.useState<ChatUser | null>(null);
   const [messages, setMessages] = React.useState<Message[]>([]);
+  const [globalMessages, setGlobalMessages] = React.useState<GlobalMessage[]>([]);
+  const [isGlobalChat, setIsGlobalChat] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [showMobileChat, setShowMobileChat] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -521,9 +531,29 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
     };
   }, [currentUserId, selectedPartnerId]);
 
+  // Load global chat messages and subscribe
+  React.useEffect(() => {
+    if (!isGlobalChat) return;
+
+    const loadGlobalChat = async () => {
+      const msgs = await getGlobalMessages(100);
+      setGlobalMessages(msgs);
+    };
+
+    loadGlobalChat();
+
+    const channel = subscribeToGlobalChat((newMsg) => {
+      setGlobalMessages(prev => [...prev, newMsg]);
+    });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [isGlobalChat]);
+
   // Fetch messages for selected conversation
   React.useEffect(() => {
-    if (!currentUserId || !selectedPartnerId) return;
+    if (!currentUserId || !selectedPartnerId || isGlobalChat) return;
 
     const fetchMessages = async () => {
       try {
@@ -575,6 +605,7 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
   }, [messages]);
 
   const handleSelectConversation = (conv: ConversationType) => {
+    setIsGlobalChat(false);
     setSelectedPartnerId(conv.partner_id);
     setShowMobileChat(true);
   };
@@ -585,27 +616,38 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!currentUserId || !selectedPartnerId) return;
+    if (!currentUserId) return;
 
     setSendingMessage(true);
     try {
-      const { data, error } = await supabase
-        .from('messages')
-        .insert({
-          sender_id: currentUserId,
-          receiver_id: selectedPartnerId,
-          message_text: content,
-        })
-        .select()
-        .single();
+      if (isGlobalChat) {
+        await sendGlobalMessage(currentUserId, content);
+      } else if (selectedPartnerId) {
+        const { data, error } = await supabase
+          .from('messages')
+          .insert({
+            sender_id: currentUserId,
+            receiver_id: selectedPartnerId,
+            message_text: content,
+          })
+          .select()
+          .single();
 
-      if (error) throw error;
-      
-      setMessages(prev => [...prev, data]);
+        if (error) throw error;
+        
+        setMessages(prev => [...prev, data]);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
     setSendingMessage(false);
+  };
+
+  const handleOpenGlobalChat = () => {
+    setIsGlobalChat(true);
+    setSelectedPartnerId(null);
+    setSelectedPartner(null);
+    setShowMobileChat(true);
   };
 
   const filteredConversations = conversations.filter(conv => {
@@ -658,6 +700,28 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
         {/* Conversation List */}
         <ScrollArea className="flex-1">
           <div className="p-2">
+            {/* Global Chat Button */}
+            <button
+              onClick={handleOpenGlobalChat}
+              className={cn(
+                'w-full p-3 flex gap-3 text-left transition-colors rounded-lg mb-2',
+                isGlobalChat ? 'bg-primary/10' : 'hover:bg-muted/50'
+              )}
+            >
+              <div className="relative flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <Users size={20} className="text-white" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-sm font-semibold text-foreground">Global Chat</span>
+                  <Badge variant="secondary" className="text-[10px] h-5 px-1.5">Community</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">Chat with everyone</p>
+              </div>
+            </button>
+
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 size={24} className="animate-spin text-muted-foreground" />
@@ -667,7 +731,7 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
                 <ConversationItem
                   key={conv.partner_id}
                   conversation={conv}
-                  isActive={selectedPartnerId === conv.partner_id}
+                  isActive={selectedPartnerId === conv.partner_id && !isGlobalChat}
                   onClick={() => handleSelectConversation(conv)}
                 />
               ))
@@ -687,9 +751,87 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
       {/* Chat Area */}
       <div className={cn(
         'flex-1 flex flex-col',
-        !showMobileChat && !selectedPartnerId ? 'hidden md:flex' : 'flex'
+        !showMobileChat && !selectedPartnerId && !isGlobalChat ? 'hidden md:flex' : 'flex'
       )}>
-        {selectedPartnerId && selectedPartner ? (
+        {isGlobalChat ? (
+          <>
+            {/* Global Chat Header */}
+            <div className="h-16 px-4 border-b border-border flex items-center gap-3 bg-card">
+              <Button variant="ghost" size="icon" className="md:hidden h-8 w-8" onClick={() => setShowMobileChat(false)}>
+                <ChevronLeft size={18} />
+              </Button>
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <MessageSquare size={20} className="text-white" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">Global Chat</h3>
+                <p className="text-xs text-muted-foreground">Community conversation</p>
+              </div>
+            </div>
+
+            {/* Global Messages */}
+            <ScrollArea className="flex-1" ref={scrollRef}>
+              <div className="py-4 space-y-3">
+                {globalMessages.map((msg, index) => {
+                  const isOwn = msg.sender_id === currentUserId;
+                  const showAvatar = index === 0 || globalMessages[index - 1].sender_id !== msg.sender_id;
+                  
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn('flex gap-2 px-4', isOwn ? 'flex-row-reverse' : '')}
+                    >
+                      {showAvatar ? (
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarFallback className="bg-gradient-to-br from-primary/80 to-primary text-primary-foreground text-xs">
+                            {msg.sender?.full_name?.[0] || '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                      ) : (
+                        <div className="w-8 flex-shrink-0" />
+                      )}
+                      <div className={cn('flex-1 max-w-[70%] space-y-1', isOwn ? 'items-end flex flex-col' : '')}>
+                        {showAvatar && (
+                          <div className={cn('flex items-center gap-2', isOwn ? 'flex-row-reverse' : '')}>
+                            <span className="text-xs font-semibold">{msg.sender?.full_name || 'Unknown'}</span>
+                            {msg.sender?.verification_status === 'verified' && <VerificationBadge size="sm" />}
+                          </div>
+                        )}
+                        <div className={cn(
+                          'rounded-2xl px-4 py-2.5',
+                          isOwn 
+                            ? 'bg-primary text-primary-foreground rounded-br-md' 
+                            : 'bg-muted rounded-bl-md'
+                        )}>
+                          <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                        </div>
+                        <span className={cn('text-[10px] text-muted-foreground px-1', isOwn ? 'text-right' : '')}>
+                          {formatMessageTime(msg.created_at)}
+                        </span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                
+                {globalMessages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Users size={48} className="text-muted-foreground/20 mb-3" />
+                    <p className="text-sm text-muted-foreground">No messages yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Be the first to say hello!
+                    </p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+
+            <MessageInput onSend={handleSendMessage} loading={sendingMessage} />
+          </>
+        ) : selectedPartnerId && selectedPartner ? (
           <>
             <ChatHeader 
               partner={selectedPartner} 

@@ -25,13 +25,22 @@ export function useUnreadMessages() {
           .eq('receiver_id', user.id)
           .eq('read', false);
 
-        if (error) throw error;
+        if (error) {
+          // Table might not exist yet, silently fail
+          if (mounted) {
+            setUnreadCount(0);
+          }
+          return;
+        }
         
         if (mounted) {
           setUnreadCount(count || 0);
         }
       } catch (error) {
-        console.error('Error fetching unread count:', error);
+        // Silently handle - table might not exist yet
+        if (mounted) {
+          setUnreadCount(0);
+        }
       } finally {
         if (mounted) {
           setLoading(false);
