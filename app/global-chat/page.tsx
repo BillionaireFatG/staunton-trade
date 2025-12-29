@@ -17,7 +17,7 @@ import {
   getOnlineUsersCount,
   getOlderGlobalMessages,
   type GlobalMessage,
-} from '@/lib/supabase/global-chat';
+} from '@/lib/supabase/master-helpers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 
