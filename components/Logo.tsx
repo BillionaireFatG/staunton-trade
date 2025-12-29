@@ -11,10 +11,10 @@ interface LogoProps {
 
 export function Logo({ size = 'md', showText = false, className = '', variant = 'auto' }: LogoProps) {
   const sizes = {
-    sm: { logo: 48, text: 'text-sm' },
-    md: { logo: 62, text: 'text-lg' },
-    lg: { logo: 82, text: 'text-xl' },
-    xl: { logo: 125, text: 'text-2xl' },
+    sm: { logo: 44, text: 'text-sm' },
+    md: { logo: 56, text: 'text-lg' },
+    lg: { logo: 75, text: 'text-xl' },
+    xl: { logo: 115, text: 'text-2xl' },
   };
 
   const { logo } = sizes[size];
