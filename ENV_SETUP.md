@@ -70,3 +70,4 @@ Ensure email confirmation is enabled:
 ### Issue: Users can log in directly without verification
 **Solution**: This is expected behavior. Supabase allows users to sign in even if their email isn't verified. The `email_confirmed_at` field will be null until they verify. You can add additional checks in your code if needed.
 
+

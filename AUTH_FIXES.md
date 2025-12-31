@@ -239,3 +239,4 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 - Verify email provider settings in Supabase
 - Check Supabase email logs in dashboard
 
+

@@ -119,3 +119,4 @@ Common issues and solutions are in `AUTH_FIXES.md` under "Troubleshooting"
 
 4. **Security:** The app uses PKCE flow for enhanced security.
 
+
