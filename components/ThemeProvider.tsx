@@ -112,8 +112,9 @@ export function ThemeProvider({
     
     const html = document.documentElement;
     
-    // Apply custom theme immediately
-    if (storedCustomTheme && CUSTOM_THEMES.includes(storedCustomTheme)) {
+    // Only apply custom theme if it exists and is not a basic theme
+    // This prevents custom themes from overriding user's light/dark selection
+    if (storedCustomTheme && CUSTOM_THEMES.includes(storedCustomTheme) && storedCustomTheme !== 'light' && storedCustomTheme !== 'dark') {
       setCustomThemeState(storedCustomTheme);
       
       // Remove all theme classes first
@@ -124,9 +125,12 @@ export function ThemeProvider({
       html.classList.add(storedCustomTheme);
       
       // Add dark class if it's a dark variant
-      if (storedCustomTheme.includes('-dark') || storedCustomTheme === 'dark') {
+      if (storedCustomTheme.includes('-dark')) {
         html.classList.add('dark');
       }
+    } else {
+      // No custom theme, clear the state
+      setCustomThemeState(null);
     }
     
     // Apply accent color
@@ -176,6 +180,9 @@ export function ThemeProvider({
     if (!mounted) return;
 
     const root = window.document.documentElement;
+    
+    // Remove all custom theme classes when applying basic light/dark theme
+    CUSTOM_THEMES.forEach(t => root.classList.remove(t));
     root.classList.remove('light', 'dark');
     
     const resolved = resolveTheme();

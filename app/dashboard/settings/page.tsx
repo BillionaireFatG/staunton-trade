@@ -362,17 +362,11 @@ function AppearanceSettings() {
   };
 
   const handleThemeChange = (themeId: string) => {
-    const html = document.documentElement;
+    // Clear any custom theme when selecting basic light/dark/system
+    localStorage.removeItem('staunton-custom-theme');
     
-    if (themeId === 'light') {
-      html.classList.remove('dark');
-      setTheme('light');
-    } else if (themeId === 'dark') {
-      html.classList.add('dark');
-      setTheme('dark');
-    } else {
-      setTheme('system');
-    }
+    // Use the ThemeProvider's setTheme function which handles everything
+    setTheme(themeId as 'light' | 'dark' | 'system');
     
     // Re-apply accent color after theme change
     const savedAccent = localStorage.getItem('staunton-accent-color');
