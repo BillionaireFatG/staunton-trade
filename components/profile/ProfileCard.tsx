@@ -62,3 +62,4 @@ export function ProfileCard({ profile, showBio = true }: ProfileCardProps) {
 }
 
 
+
