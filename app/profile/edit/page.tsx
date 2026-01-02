@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Upload, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { Loader2, Upload, CheckCircle2, Clock, XCircle, ArrowLeft } from 'lucide-react';
 import type { UserRole } from '@/types/profile';
 
 export default function EditProfilePage() {
@@ -132,8 +132,14 @@ export default function EditProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Edit Profile</h1>
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="gap-2">
+          <ArrowLeft size={16} />
+          Dashboard
+        </Button>
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold">Edit Profile</h1>
+        </div>
         <Button variant="outline" onClick={() => router.push('/profile')}>
           View Profile
         </Button>
@@ -287,6 +293,7 @@ export default function EditProfilePage() {
     </div>
   );
 }
+
 
 
 

@@ -1,387 +1,446 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
-import type { DealInsert } from '@/types/database';
+import { useAuth } from '@/components/AuthProvider';
+import { createDeal, COMMODITY_LABELS, CommodityType, searchCounterparties } from '@/lib/supabase/deals';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  ArrowLeft, 
-  AlertCircle, 
-  Loader2,
-  Package,
-  DollarSign,
-  Users,
-  Calendar,
-  FileText,
-  Sparkles
-} from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, ArrowRight, Check, Loader2, Search, CheckCircle2 } from 'lucide-react';
+
+const STEPS = [
+  { id: 1, name: 'Commodity' },
+  { id: 2, name: 'Counterparty' },
+  { id: 3, name: 'Delivery' },
+  { id: 4, name: 'Details' },
+  { id: 5, name: 'Review' },
+];
+
+const TANK_FARMS = ['KOOLE', 'Vopak', 'Oiltanking', 'HES', 'Other'];
 
 export default function NewDealPage() {
+  const { user } = useAuth();
   const router = useRouter();
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const [formData, setFormData] = useState({
-    commodity_type: '',
-    volume: '',
-    price_per_unit: '',
-    buyer_name: '',
-    seller_name: '',
-    contract_date: '',
-    injection_date: '',
-    delivery_date: '',
-    notes: '',
-  });
+  const [success, setSuccess] = useState(false);
+  const [createdDealId, setCreatedDealId] = useState<string | null>(null);
 
-  const totalValue = useMemo(() => {
-    const volume = parseFloat(formData.volume) || 0;
-    const price = parseFloat(formData.price_per_unit) || 0;
-    return volume * price;
-  }, [formData.volume, formData.price_per_unit]);
+  // Form state
+  const [commodityType, setCommodityType] = useState<CommodityType>('fuel_diesel');
+  const [quantity, setQuantity] = useState('');
+  const [unitPrice, setUnitPrice] = useState('');
+  const [currency, setCurrency] = useState('USD');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const [userRole, setUserRole] = useState<'buyer' | 'seller'>('buyer');
+  const [counterpartySearch, setCounterpartySearch] = useState('');
+  const [counterparties, setCounterparties] = useState<any[]>([]);
+  const [selectedCounterparty, setSelectedCounterparty] = useState<any>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const [deliveryLocation, setDeliveryLocation] = useState('');
+  const [tankFarm, setTankFarm] = useState('');
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [expectedCompletion, setExpectedCompletion] = useState('');
 
-    if (!formData.commodity_type || !formData.volume || !formData.price_per_unit || 
-        !formData.buyer_name || !formData.seller_name) {
-      setError('Please fill in all required fields');
-      setLoading(false);
+  const [vesselName, setVesselName] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const totalValue = (parseFloat(quantity) || 0) * (parseFloat(unitPrice) || 0);
+
+  const handleSearch = async (query: string) => {
+    setCounterpartySearch(query);
+    if (query.length < 2) {
+      setCounterparties([]);
       return;
     }
+    setSearchLoading(true);
+    const results = await searchCounterparties(query);
+    setCounterparties(results.filter(p => p.id !== user?.id));
+    setSearchLoading(false);
+  };
 
-    const volume = parseFloat(formData.volume);
-    const pricePerUnit = parseFloat(formData.price_per_unit);
-    const calculatedTotal = volume * pricePerUnit;
+  const handleSubmit = async () => {
+    if (!user) return;
+    setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/sign-in');
-        return;
-      }
+      const deal = await createDeal({
+        commodity_type: commodityType,
+        quantity: parseFloat(quantity),
+        unit_price: parseFloat(unitPrice),
+        currency,
+        buyer_id: userRole === 'buyer' ? user.id : selectedCounterparty?.id,
+        seller_id: userRole === 'seller' ? user.id : selectedCounterparty?.id,
+        delivery_location: deliveryLocation,
+        tank_farm: tankFarm || undefined,
+        scheduled_injection_date: scheduledDate || undefined,
+        expected_completion_date: expectedCompletion || undefined,
+        vessel_name: vesselName || undefined,
+        notes: notes || undefined,
+      });
 
-      const dealData: DealInsert = {
-        user_id: user.id,
-        commodity_type: formData.commodity_type,
-        volume: volume.toString(),
-        price_per_unit: pricePerUnit.toString(),
-        total_value: calculatedTotal.toString(),
-        buyer_name: formData.buyer_name,
-        seller_name: formData.seller_name,
-        contract_date: formData.contract_date || null,
-        injection_date: formData.injection_date || null,
-        delivery_date: formData.delivery_date || null,
-        notes: formData.notes || null,
-        status: 'pending',
-      };
-
-      const { error: insertError } = await supabase
-        .from('deals')
-        .insert([dealData]);
-
-      if (insertError) {
-        setError(insertError.message);
-        setLoading(false);
-        return;
-      }
-
-      router.push('/dashboard/deals');
-      router.refresh();
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setCreatedDealId(deal.id);
+      setSuccess(true);
+    } catch (error) {
+      console.error('Error creating deal:', error);
+      alert('Failed to create deal. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
+  const canProceed = () => {
+    switch (step) {
+      case 1: return commodityType && quantity && unitPrice;
+      case 2: return selectedCounterparty;
+      case 3: return deliveryLocation;
+      case 4: return true;
+      case 5: return true;
+      default: return false;
+    }
   };
+
+  if (success) {
+    return (
+      <div className="max-w-md mx-auto py-20 text-center">
+        <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 className="w-8 h-8 text-green-600" />
+        </div>
+        <h1 className="text-2xl font-bold mb-2">Deal Created!</h1>
+        <p className="text-muted-foreground mb-8">Your deal has been created successfully.</p>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={() => router.push(`/dashboard/deals/${createdDealId}`)}>
+            View Deal
+          </Button>
+          <Button variant="outline" onClick={() => {
+            setSuccess(false);
+            setStep(1);
+            setCommodityType('fuel_diesel');
+            setQuantity('');
+            setUnitPrice('');
+            setSelectedCounterparty(null);
+            setDeliveryLocation('');
+          }}>
+            Create Another
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <Link 
-          href="/dashboard/deals" 
-          className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-foreground transition-colors mb-4"
-        >
-          <ArrowLeft size={14} />
-          Back to Deals
-        </Link>
-        
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-            <Sparkles size={18} className="text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground tracking-tight">Create New Deal</h1>
-            <p className="text-[13px] text-muted-foreground mt-0.5">Fill in the details to create a new commodity deal</p>
-          </div>
-        </div>
+      <div className="flex items-center gap-4 mb-8">
+        <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard/deals')}>
+          <ArrowLeft size={16} className="mr-2" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">Create New Deal</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Error Message */}
-        {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 flex items-center gap-3">
-            <AlertCircle size={18} className="text-red-500 flex-shrink-0" />
-            <p className="text-[13px] text-red-600 dark:text-red-400">{error}</p>
+      {/* Progress Steps */}
+      <div className="flex items-center justify-between mb-8">
+        {STEPS.map((s, i) => (
+          <div key={s.id} className="flex items-center">
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+              step > s.id ? 'bg-primary text-primary-foreground' :
+              step === s.id ? 'bg-primary text-primary-foreground' :
+              'bg-accent text-muted-foreground'
+            }`}>
+              {step > s.id ? <Check size={14} /> : s.id}
+            </div>
+            <span className={`ml-2 text-sm ${step >= s.id ? 'text-foreground' : 'text-muted-foreground'}`}>
+              {s.name}
+            </span>
+            {i < STEPS.length - 1 && (
+              <div className={`w-12 h-0.5 mx-4 ${step > s.id ? 'bg-primary' : 'bg-border'}`} />
+            )}
           </div>
-        )}
+        ))}
+      </div>
 
-        {/* Commodity Section */}
-        <div className="rounded-xl bg-card border border-border overflow-hidden">
-          <div className="px-5 py-4 border-b border-border">
-            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
-              <Package size={16} className="text-primary" />
-              Commodity Details
-            </h2>
+      {/* Step 1: Commodity */}
+      {step === 1 && (
+        <div className="space-y-6">
+          <div>
+            <Label>Commodity Type</Label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {Object.entries(COMMODITY_LABELS).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => setCommodityType(key as CommodityType)}
+                  className={`p-3 rounded-lg border text-left transition-colors ${
+                    commodityType === key
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <span className="text-sm font-medium">{label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="p-5 space-y-5">
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="commodity_type" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                Commodity Type <span className="text-red-500">*</span>
-              </Label>
-              <select
-                id="commodity_type"
-                name="commodity_type"
-                value={formData.commodity_type}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              <Label htmlFor="quantity">Quantity (MT)</Label>
+              <Input
+                id="quantity"
+                type="number"
+                placeholder="1000"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="unitPrice">Unit Price (USD/MT)</Label>
+              <Input
+                id="unitPrice"
+                type="number"
+                placeholder="850"
+                value={unitPrice}
+                onChange={(e) => setUnitPrice(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {totalValue > 0 && (
+            <div className="p-4 bg-accent rounded-lg">
+              <p className="text-sm text-muted-foreground">Total Value</p>
+              <p className="text-2xl font-bold">${totalValue.toLocaleString()} {currency}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Step 2: Counterparty */}
+      {step === 2 && (
+        <div className="space-y-6">
+          <div>
+            <Label>Your Role</Label>
+            <div className="flex gap-2 mt-2">
+              <Button
+                variant={userRole === 'buyer' ? 'default' : 'outline'}
+                onClick={() => setUserRole('buyer')}
               >
-                <option value="">Select commodity type</option>
-                <option value="Diesel">Diesel</option>
-                <option value="Jet Fuel">Jet Fuel</option>
-                <option value="Gasoline">Gasoline</option>
-                <option value="Crude Oil">Crude Oil</option>
-                <option value="LNG">LNG</option>
-              </select>
+                I am the Buyer
+              </Button>
+              <Button
+                variant={userRole === 'seller' ? 'default' : 'outline'}
+                onClick={() => setUserRole('seller')}
+              >
+                I am the Seller
+              </Button>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="volume" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Volume (BBL) <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="number"
-                  id="volume"
-                  name="volume"
-                  value={formData.volume}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  step="0.01"
-                  disabled={loading}
-                  placeholder="0"
-                  className="h-10"
-                />
-              </div>
-              <div>
-                <Label htmlFor="price_per_unit" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Price per Unit <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[14px]">$</span>
-                  <Input
-                    type="number"
-                    id="price_per_unit"
-                    name="price_per_unit"
-                    value={formData.price_per_unit}
-                    onChange={handleChange}
-                    required
-                    min="0"
-                    step="0.01"
-                    disabled={loading}
-                    placeholder="0.00"
-                    className="h-10 pl-7"
-                  />
+          <div>
+            <Label>Find {userRole === 'buyer' ? 'Seller' : 'Buyer'}</Label>
+            <div className="relative mt-2">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or company..."
+                value={counterpartySearch}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {searchLoading && <Loader2 className="h-5 w-5 animate-spin mx-auto" />}
+
+          {counterparties.length > 0 && (
+            <div className="space-y-2">
+              {counterparties.map((cp) => (
+                <button
+                  key={cp.id}
+                  onClick={() => setSelectedCounterparty(cp)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                    selectedCounterparty?.id === cp.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={cp.avatar_url} />
+                    <AvatarFallback>{cp.full_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 text-left">
+                    <p className="font-medium">{cp.full_name}</p>
+                    <p className="text-sm text-muted-foreground">{cp.company_name}</p>
+                  </div>
+                  {cp.verification_status === 'verified' && (
+                    <Badge variant="outline" className="bg-green-500/10 text-green-500">Verified</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {selectedCounterparty && (
+            <div className="p-4 bg-accent rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">Selected {userRole === 'buyer' ? 'Seller' : 'Buyer'}</p>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedCounterparty.avatar_url} />
+                  <AvatarFallback>{selectedCounterparty.full_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{selectedCounterparty.full_name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedCounterparty.company_name}</p>
                 </div>
               </div>
             </div>
-
-            {/* Total Value Display */}
-            <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <DollarSign size={16} className="text-primary" />
-                  <span className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider">Total Value</span>
-                </div>
-                <span className="text-xl font-semibold text-foreground">{formatCurrency(totalValue)}</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
+      )}
 
-        {/* Parties Section */}
-        <div className="rounded-xl bg-card border border-border overflow-hidden">
-          <div className="px-5 py-4 border-b border-border">
-            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
-              <Users size={16} className="text-purple-500" />
-              Parties
-            </h2>
+      {/* Step 3: Delivery */}
+      {step === 3 && (
+        <div className="space-y-6">
+          <div>
+            <Label htmlFor="location">Delivery Location</Label>
+            <Input
+              id="location"
+              placeholder="Rotterdam, Netherlands"
+              value={deliveryLocation}
+              onChange={(e) => setDeliveryLocation(e.target.value)}
+            />
           </div>
-          <div className="p-5 grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="buyer_name" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                Buyer Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="text"
-                id="buyer_name"
-                name="buyer_name"
-                value={formData.buyer_name}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                placeholder="Enter buyer name"
-                className="h-10"
-              />
-            </div>
-            <div>
-              <Label htmlFor="seller_name" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                Seller Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="text"
-                id="seller_name"
-                name="seller_name"
-                value={formData.seller_name}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                placeholder="Enter seller name"
-                className="h-10"
-              />
-            </div>
-          </div>
-        </div>
 
-        {/* Timeline Section */}
-        <div className="rounded-xl bg-card border border-border overflow-hidden">
-          <div className="px-5 py-4 border-b border-border">
-            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
-              <Calendar size={16} className="text-amber-500" />
-              Timeline
-            </h2>
+          <div>
+            <Label>Tank Farm</Label>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {TANK_FARMS.map((farm) => (
+                <button
+                  key={farm}
+                  onClick={() => setTankFarm(farm)}
+                  className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
+                    tankFarm === farm
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  {farm}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="p-5 grid grid-cols-3 gap-4">
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="contract_date" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                Contract Date
-              </Label>
+              <Label htmlFor="scheduledDate">Scheduled Injection</Label>
               <Input
+                id="scheduledDate"
                 type="date"
-                id="contract_date"
-                name="contract_date"
-                value={formData.contract_date}
-                onChange={handleChange}
-                disabled={loading}
-                className="h-10"
+                value={scheduledDate}
+                onChange={(e) => setScheduledDate(e.target.value)}
               />
             </div>
             <div>
-              <Label htmlFor="injection_date" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                Injection Date
-              </Label>
+              <Label htmlFor="expectedCompletion">Expected Completion</Label>
               <Input
+                id="expectedCompletion"
                 type="date"
-                id="injection_date"
-                name="injection_date"
-                value={formData.injection_date}
-                onChange={handleChange}
-                disabled={loading}
-                className="h-10"
-              />
-            </div>
-            <div>
-              <Label htmlFor="delivery_date" className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                Delivery Date
-              </Label>
-              <Input
-                type="date"
-                id="delivery_date"
-                name="delivery_date"
-                value={formData.delivery_date}
-                onChange={handleChange}
-                disabled={loading}
-                className="h-10"
+                value={expectedCompletion}
+                onChange={(e) => setExpectedCompletion(e.target.value)}
               />
             </div>
           </div>
         </div>
+      )}
 
-        {/* Notes Section */}
-        <div className="rounded-xl bg-card border border-border overflow-hidden">
-          <div className="px-5 py-4 border-b border-border">
-            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2">
-              <FileText size={16} className="text-muted-foreground" />
-              Additional Notes
-            </h2>
+      {/* Step 4: Additional Details */}
+      {step === 4 && (
+        <div className="space-y-6">
+          <div>
+            <Label htmlFor="vessel">Vessel Name (Optional)</Label>
+            <Input
+              id="vessel"
+              placeholder="MT Pacific Star"
+              value={vesselName}
+              onChange={(e) => setVesselName(e.target.value)}
+            />
           </div>
-          <div className="p-5">
+
+          <div>
+            <Label htmlFor="notes">Notes (Optional)</Label>
             <Textarea
               id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              disabled={loading}
+              placeholder="Any additional details..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               rows={4}
-              placeholder="Add any additional notes about this deal..."
-              className="resize-none"
             />
           </div>
         </div>
+      )}
 
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-2">
-          <p className="text-[12px] text-muted-foreground">
-            <span className="text-red-500">*</span> Required fields
-          </p>
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => router.push('/dashboard/deals')}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                'Create Deal'
-              )}
-            </Button>
+      {/* Step 5: Review */}
+      {step === 5 && (
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold">Review Deal</h2>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-accent rounded-lg">
+              <p className="text-sm text-muted-foreground">Commodity</p>
+              <p className="font-medium">{COMMODITY_LABELS[commodityType]}</p>
+              <p className="text-sm">{quantity} MT at ${unitPrice}/MT</p>
+              <p className="text-lg font-bold mt-2">${totalValue.toLocaleString()} {currency}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg">
+                <p className="text-sm text-muted-foreground">Buyer</p>
+                <p className="font-medium">
+                  {userRole === 'buyer' ? 'You' : selectedCounterparty?.full_name}
+                </p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <p className="text-sm text-muted-foreground">Seller</p>
+                <p className="font-medium">
+                  {userRole === 'seller' ? 'You' : selectedCounterparty?.full_name}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 border rounded-lg">
+              <p className="text-sm text-muted-foreground">Delivery</p>
+              <p className="font-medium">{deliveryLocation}</p>
+              {tankFarm && <p className="text-sm">{tankFarm}</p>}
+            </div>
           </div>
         </div>
-      </form>
+      )}
+
+      {/* Navigation */}
+      <div className="flex justify-between mt-8 pt-6 border-t">
+        <Button
+          variant="outline"
+          onClick={() => setStep(step - 1)}
+          disabled={step === 1}
+        >
+          <ArrowLeft size={16} className="mr-2" />
+          Back
+        </Button>
+
+        {step < 5 ? (
+          <Button onClick={() => setStep(step + 1)} disabled={!canProceed()}>
+            Next
+            <ArrowRight size={16} className="ml-2" />
+          </Button>
+        ) : (
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Create Deal
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

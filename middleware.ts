@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile') || pathname.startsWith('/messages')) {
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile') || pathname.startsWith('/messages') || pathname.startsWith('/voice-rooms')) {
     if (!user) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/sign-in';

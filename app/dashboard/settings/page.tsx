@@ -31,7 +31,14 @@ import {
   Upload,
   Link as LinkIcon,
   ExternalLink,
+  ArrowLeft,
+  Crown,
+  Gift,
+  Trophy,
+  Star,
+  Zap,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -741,24 +748,161 @@ function SecuritySettings() {
   );
 }
 
+function TradingTierSettings() {
+  const tiers = [
+    { id: 'bronze', name: 'Bronze', points: 0, color: 'from-amber-700 to-orange-600', benefits: ['Basic support', 'Standard fees', 'Market access'] },
+    { id: 'silver', name: 'Silver', points: 1000, color: 'from-gray-400 to-slate-500', benefits: ['Priority support', '5% fee reduction', 'Analytics access'] },
+    { id: 'gold', name: 'Gold', points: 5000, color: 'from-yellow-400 to-amber-500', benefits: ['24/7 support', '10% fee reduction', 'Featured listings'] },
+    { id: 'platinum', name: 'Platinum', points: 15000, color: 'from-slate-300 to-zinc-400', benefits: ['Dedicated manager', '15% fee reduction', 'Premium analytics'] },
+    { id: 'diamond', name: 'Diamond', points: 50000, color: 'from-cyan-300 to-blue-400', benefits: ['Concierge service', '25% fee reduction', 'VIP access'] },
+  ];
+
+  const currentTier = 'gold';
+  const currentPoints = 7500;
+  const nextTierPoints = 15000;
+  const progress = Math.round((currentPoints / nextTierPoints) * 100);
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Crown size={18} className="text-primary" />
+            Your Trading Tier
+          </CardTitle>
+          <CardDescription>View your current tier status and benefits</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 text-white mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-white/80">Current Tier</p>
+                <p className="text-2xl font-bold">Gold Member</p>
+              </div>
+              <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                <Trophy size={28} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{currentPoints.toLocaleString()} pts</span>
+                <span>Platinum at {nextTierPoints.toLocaleString()} pts</span>
+              </div>
+              <div className="h-2 bg-white/30 rounded-full overflow-hidden">
+                <div className="h-full bg-white rounded-full transition-all" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">All Tiers</h4>
+            {tiers.map((tier) => {
+              const isActive = tier.id === currentTier;
+              const isLocked = tiers.findIndex(t => t.id === tier.id) > tiers.findIndex(t => t.id === currentTier);
+              return (
+                <div 
+                  key={tier.id}
+                  className={cn(
+                    'p-4 rounded-lg border transition-all',
+                    isActive ? 'border-primary bg-primary/5' : 'border-border',
+                    isLocked && 'opacity-60'
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tier.color} flex items-center justify-center`}>
+                      {isLocked ? (
+                        <Lock size={16} className="text-white" />
+                      ) : (
+                        <Star size={16} className="text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{tier.name}</p>
+                        {isActive && <Badge variant="default" className="text-[10px]">Current</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{tier.points.toLocaleString()} points required</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {tier.benefits.map((benefit, i) => (
+                      <span key={i} className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                        {benefit}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Gift size={18} className="text-primary" />
+            Rewards & Points
+          </CardTitle>
+          <CardDescription>Manage your rewards and view point history</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-4 rounded-lg bg-muted/50 text-center">
+              <p className="text-2xl font-bold text-primary">7,500</p>
+              <p className="text-xs text-muted-foreground">Available Points</p>
+            </div>
+            <div className="p-4 rounded-lg bg-muted/50 text-center">
+              <p className="text-2xl font-bold">12,500</p>
+              <p className="text-xs text-muted-foreground">Lifetime Earned</p>
+            </div>
+            <div className="p-4 rounded-lg bg-muted/50 text-center">
+              <p className="text-2xl font-bold">5</p>
+              <p className="text-xs text-muted-foreground">Rewards Redeemed</p>
+            </div>
+          </div>
+          <Button variant="outline" className="w-full" asChild>
+            <a href="/dashboard/loyalty">
+              <Zap size={14} className="mr-2" />
+              View All Rewards
+            </a>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Main Settings Page
 export default function SettingsPage() {
+  const router = useRouter();
+  
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage your account settings and preferences
-        </p>
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="gap-2">
+          <ArrowLeft size={16} />
+          Dashboard
+        </Button>
+        <div className="flex-1">
+          <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage your account settings and preferences
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
           <TabsTrigger value="profile" className="gap-2">
             <User size={14} />
             <span className="hidden sm:inline">Profile</span>
+          </TabsTrigger>
+          <TabsTrigger value="trading" className="gap-2">
+            <Crown size={14} />
+            <span className="hidden sm:inline">Tier</span>
           </TabsTrigger>
           <TabsTrigger value="appearance" className="gap-2">
             <Palette size={14} />
@@ -776,6 +920,10 @@ export default function SettingsPage() {
 
         <TabsContent value="profile">
           <ProfileSettings />
+        </TabsContent>
+
+        <TabsContent value="trading">
+          <TradingTierSettings />
         </TabsContent>
 
         <TabsContent value="appearance">

@@ -124,7 +124,7 @@ const ACCENT_COLORS = [
 ];
 
 interface ThemeCustomizerProps {
-  variant?: 'dropdown' | 'panel';
+  variant?: 'dropdown' | 'panel' | 'inline';
 }
 
 export function ThemeCustomizer({ variant = 'dropdown' }: ThemeCustomizerProps) {
@@ -359,6 +359,44 @@ export function ThemeCustomizer({ variant = 'dropdown' }: ThemeCustomizerProps) 
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+    );
+  }
+
+  if (variant === 'inline') {
+    return (
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground uppercase">Theme</p>
+        <div className="flex gap-1">
+          <button
+            onClick={() => handleThemeChange('light')}
+            className={`flex-1 p-2 rounded-lg text-xs font-medium transition-colors ${
+              currentTheme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-accent hover:bg-accent/80'
+            }`}
+          >
+            <Sun size={14} className="mx-auto mb-1" />
+            Light
+          </button>
+          <button
+            onClick={() => handleThemeChange('dark')}
+            className={`flex-1 p-2 rounded-lg text-xs font-medium transition-colors ${
+              currentTheme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-accent hover:bg-accent/80'
+            }`}
+          >
+            <Moon size={14} className="mx-auto mb-1" />
+            Dark
+          </button>
+          <button
+            onClick={() => {
+              setTheme('system');
+              handleThemeChange(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            }}
+            className="flex-1 p-2 rounded-lg text-xs font-medium bg-accent hover:bg-accent/80 transition-colors"
+          >
+            <Monitor size={14} className="mx-auto mb-1" />
+            Auto
+          </button>
+        </div>
+      </div>
     );
   }
 

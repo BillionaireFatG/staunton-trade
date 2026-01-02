@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProfileBadge } from '@/components/profile/ProfileBadge';
-import { Loader2, MessageCircle, MapPin, Building2 } from 'lucide-react';
+import { Loader2, MessageCircle, MapPin, Building2, ArrowLeft } from 'lucide-react';
 import type { Profile } from '@/types/profile';
 
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
@@ -75,6 +75,12 @@ export default function PublicProfilePage({ params }: { params: { userId: string
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="gap-2">
+          <ArrowLeft size={16} />
+          Dashboard
+        </Button>
+      </div>
       <Card>
         <CardContent className="p-8">
           <div className="flex items-start gap-6">

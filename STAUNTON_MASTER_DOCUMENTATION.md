@@ -13,12 +13,13 @@
 2. [Environment Setup](#environment-setup)
 3. [Authentication System](#authentication-system)
 4. [Profile & Chat System](#profile--chat-system)
-5. [Performance Optimizations](#performance-optimizations)
-6. [Complete Implementation History](#complete-implementation-history)
-7. [Database Schema & Migrations](#database-schema--migrations)
-8. [API Reference](#api-reference)
-9. [Deployment Checklist](#deployment-checklist)
-10. [Troubleshooting Guide](#troubleshooting-guide)
+5. [Voice Trading Rooms](#voice-trading-rooms)
+6. [Performance Optimizations](#performance-optimizations)
+7. [Complete Implementation History](#complete-implementation-history)
+8. [Database Schema & Migrations](#database-schema--migrations)
+9. [API Reference](#api-reference)
+10. [Deployment Checklist](#deployment-checklist)
+11. [Troubleshooting Guide](#troubleshooting-guide)
 
 ---
 
@@ -597,6 +598,307 @@ function MyComponent() {
 - **Purpose:** Deal documents
 - **Max Size:** 10MB
 - **Formats:** PDF
+
+---
+
+## Voice Trading Rooms
+
+### Overview
+
+Discord-style voice trading rooms enabling real-time voice communication for commodity traders. Built with Supabase Realtime and Agora.io for professional B2B trading discussions.
+
+**Status:** ✅ UI/UX Complete | ⏳ Audio Integration Pending Agora Setup
+
+### Features Implemented
+
+- ✅ **Enhanced Top Bar**
+  - Global search (⌘K) for users, deals, and rooms
+  - Voice status indicator (center)
+  - Quick actions and notifications (right)
+  
+- ✅ **Voice Rooms Page** (`/voice-rooms`)
+  - Room list with filters and sorting
+  - Participant grid with verification badges
+  - Real-time participant updates
+  - Voice controls (mute, leave, settings)
+  
+- ✅ **Professional UI/UX**
+  - Speaking indicators (animated green ring)
+  - Mute status display
+  - Verification and role badges
+  - Hover actions (Send DM, View Profile)
+  - Keyboard shortcuts (M for mute, L for leave)
+
+### Database Tables
+
+#### voice_rooms
+```sql
+- id (UUID, primary key)
+- name (TEXT)
+- category (TEXT) - 'fuel', 'metals', 'agriculture', 'logistics', 'general'
+- emoji (TEXT)
+- agora_channel_name (TEXT, unique)
+- description (TEXT, nullable)
+- is_public (BOOLEAN, default true)
+- created_at (TIMESTAMP)
+```
+
+#### voice_participants
+```sql
+- id (UUID, primary key)
+- room_id (UUID, foreign key → voice_rooms)
+- user_id (UUID, foreign key → profiles)
+- is_muted (BOOLEAN, default false)
+- is_speaking (BOOLEAN, default false)
+- joined_at (TIMESTAMP)
+- UNIQUE(room_id, user_id)
+```
+
+### Setup Instructions
+
+#### 1. Run Database Migration
+
+In Supabase Dashboard:
+1. Go to **SQL Editor**
+2. Run `supabase/migrations/005_voice_rooms.sql`
+3. Verify tables created: `voice_rooms`, `voice_participants`
+
+#### 2. Enable Realtime
+
+In Supabase Dashboard:
+1. Go to **Database** → **Replication**
+2. Enable replication for: `voice_participants` table
+
+#### 3. Install Agora SDK (Optional - for production audio)
+
+```bash
+cd staunton-frontend
+npm install agora-rtc-react agora-rtc-sdk-ng
+```
+
+#### 4. Get Agora Credentials (Optional)
+
+1. Sign up at [Agora.io](https://www.agora.io/)
+2. Create a new project
+3. Get your **App ID**
+
+#### 5. Add Environment Variable (Optional)
+
+Add to `.env.local`:
+```bash
+NEXT_PUBLIC_AGORA_APP_ID=your-agora-app-id-here
+```
+
+### Helper Functions
+
+**File:** `lib/supabase/voice.ts`
+
+```typescript
+// Get all public voice rooms
+getVoiceRooms()
+
+// Get rooms with participant counts
+getVoiceRoomsWithCounts()
+
+// Get specific room
+getVoiceRoom(roomId)
+
+// Get room participants
+getRoomParticipants(roomId)
+
+// Join a room
+joinRoom(roomId, userId)
+
+// Leave a room
+leaveRoom(roomId, userId)
+
+// Update mute status
+updateMuteStatus(roomId, userId, isMuted)
+
+// Subscribe to room changes
+subscribeToRoom(roomId, callback)
+```
+
+### Components
+
+#### VoiceStatusBar
+**File:** `components/voice/VoiceStatusBar.tsx`
+
+Displays in the top bar center:
+- "Browse Voice Rooms" button when not in a room
+- Room name, participant count, and controls when in a room
+
+#### ParticipantCard
+**File:** `components/voice/ParticipantCard.tsx`
+
+Individual participant display:
+- Avatar with online status
+- Name, company, verification badge
+- Role badges (buyer/seller/trader)
+- Speaking indicator (animated)
+- Muted icon if applicable
+- Hover actions: DM, View Profile
+
+#### VoiceControls
+**File:** `components/voice/VoiceControls.tsx`
+
+Fixed bottom control bar:
+- Large mute toggle (red when muted)
+- Leave room button (with confirmation)
+- Settings dropdown (audio devices, volume)
+- Keyboard shortcuts displayed
+
+#### RoomList
+**File:** `components/voice/RoomList.tsx`
+
+Left sidebar room list:
+- Category filters
+- Sort options (Most Active, Category, Name)
+- Room cards with participant avatars
+- Join button on hover
+
+### Usage Flow
+
+#### Joining a Room
+```
+User browses rooms → Clicks "Join Room" → 
+User added to participants → Voice controls appear → 
+Real-time updates begin
+```
+
+#### Leaving a Room
+```
+User clicks "Leave Room" → Confirmation dialog → 
+User removed from participants → Voice controls hidden
+```
+
+### Keyboard Shortcuts
+
+- **⌘K** (or Ctrl+K) - Open global search
+- **M** - Toggle mute (when in room)
+- **L** - Leave room (when in room)
+- **ESC** - Close search modal
+- **↑/↓** - Navigate search results
+- **Enter** - Select search result
+
+### Default Rooms
+
+Six default rooms are created:
+1. 🛢️ **Fuel Trading** - Petroleum products, pricing, fuel deals
+2. ⚡ **Metals & Commodities** - Base metals, precious metals
+3. 🌾 **Agriculture Trading** - Grains, oils, agricultural commodities
+4. 🚢 **Logistics & Shipping** - Shipments, tank farms, delivery
+5. 📊 **Market Discussion** - Market analysis, trading insights
+6. 💼 **General Trading** - Open discussion for all commodity types
+
+### Real-time Features
+
+- Participant list updates instantly when users join/leave
+- Speaking indicators animate in real-time
+- Mute status syncs across all clients
+- Room participant counts update automatically
+
+### Security
+
+- **RLS Policies:** All tables protected with Row Level Security
+- **Authentication:** Required for all voice operations
+- **Public Rooms:** Anyone authenticated can view and join
+- **Private Rooms:** Can be added in future (is_public = false)
+
+### Mobile Responsiveness
+
+- Simplified participant grid (1 column on mobile)
+- Floating voice controls (fixed bottom)
+- Touch-friendly buttons
+- Responsive layout adapts to screen size
+
+### Performance
+
+- Lazy loading for heavy components
+- Efficient Realtime subscriptions (per-room)
+- Debounced UI updates
+- Optimized participant list re-renders
+
+### Files Created
+
+**Database:**
+- `supabase/migrations/005_voice_rooms.sql`
+
+**Components:**
+- `components/voice/VoiceStatusBar.tsx`
+- `components/voice/ParticipantCard.tsx`
+- `components/voice/VoiceControls.tsx`
+- `components/voice/RoomList.tsx`
+- `components/GlobalSearch.tsx`
+
+**Pages:**
+- `app/voice-rooms/page.tsx`
+
+**Helpers:**
+- `lib/supabase/voice.ts`
+- `lib/agora/client.ts`
+
+**Documentation:**
+- `VOICE_ROOMS_SETUP.md`
+
+**Files Modified:**
+- `app/dashboard/DashboardLayoutClient.tsx` (enhanced top bar, added voice link)
+- `middleware.ts` (protect /voice-rooms route)
+
+### Current State
+
+**What Works:**
+- ✅ Browsing voice rooms
+- ✅ Joining/leaving rooms
+- ✅ Seeing who's in each room
+- ✅ Real-time participant updates
+- ✅ UI/UX for voice controls
+- ✅ Verification and role badges
+- ✅ Global search
+- ✅ Keyboard shortcuts
+
+**What's Pending:**
+- ⏳ Actual voice audio (requires Agora SDK installation)
+- ⏳ Speaking detection (requires Agora integration)
+- ⏳ Microphone permission handling (requires Agora)
+
+### Production Readiness
+
+**For MVP (Without Agora):**
+The system is **ready to use** for:
+- Team coordination
+- Deal discussions
+- Seeing who's online
+- Building community
+
+**For Production (With Agora):**
+1. Install Agora SDK
+2. Get Agora App ID
+3. Add environment variable
+4. Update `lib/agora/client.ts` with actual implementation
+5. Test microphone permissions
+6. Test audio streaming
+
+### Troubleshooting
+
+#### "No rooms available"
+- Run the database migration `005_voice_rooms.sql`
+- Check Supabase connection
+- Verify `voice_rooms` table exists
+
+#### "Failed to join room"
+- Check user is authenticated
+- Verify RLS policies are correct
+- Check browser console for errors
+
+#### Real-time not working
+- Enable Realtime for `voice_participants` table
+- Check Supabase Realtime status
+- Verify WebSocket connection in Network tab
+
+### Next Steps
+
+See `VOICE_ROOMS_SETUP.md` for detailed setup instructions and integration guide.
 
 ---
 
