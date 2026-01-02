@@ -10,6 +10,12 @@
 */
 
 @layer base {
+  /* Prevent horizontal scroll globally */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
   /* ==========================================
      LIGHT THEME (Default)
      Clean, professional with warm accents

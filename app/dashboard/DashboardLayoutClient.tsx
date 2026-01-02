@@ -373,7 +373,7 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
       )}
 
       {/* Main Content */}
-      <div className="md:pl-60 pt-14 md:pt-0">
+      <div className="md:pl-60 pt-14 md:pt-0 min-w-0 w-full overflow-x-hidden">
         {/* Desktop Top Bar - Command Center */}
         <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/95 backdrop-blur hidden md:flex items-center px-6">
           {/* Left: Search */}
@@ -491,7 +491,7 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
         </header>
 
         {/* Page Content */}
-        <main className="p-4 md:p-6 lg:p-8">
+        <main className="p-4 md:p-6 lg:p-8 min-w-0 w-full">
           {children}
         </main>
       </div>

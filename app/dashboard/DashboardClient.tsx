@@ -185,9 +185,9 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 w-full">
       {/* Hero Section with Globe */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
         {/* Globe Section */}
         <Card className="lg:col-span-2 overflow-hidden">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
@@ -300,17 +300,17 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
       </div>
 
       {/* Chart Section */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <Card className="min-w-0">
+        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between pb-2 gap-3">
           <div>
             <CardTitle className="text-base font-semibold">Trading Volume</CardTitle>
             <CardDescription>Daily volume over the last 90 days</CardDescription>
           </div>
-          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg overflow-x-auto w-full md:w-auto">
             {['Last 90 days', 'Last 30 days', 'Last 7 days'].map((period, i) => (
               <button
                 key={period}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                className={`px-2 md:px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                   i === 0 
                     ? 'bg-background text-foreground shadow-sm' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -321,9 +321,9 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
             ))}
           </div>
         </CardHeader>
-        <CardContent className="pb-4">
+        <CardContent className="pb-4 overflow-x-auto">
           {/* Interactive chart visualization */}
-          <div className="h-48 flex items-end gap-px group">
+          <div className="h-48 flex items-end gap-px group min-w-[600px]">
             {Array.from({ length: 90 }).map((_, i) => {
               const baseHeight = 30 + Math.sin(i * 0.15) * 25;
               const noise = Math.random() * 20;
@@ -349,16 +349,16 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
       </Card>
 
       {/* Deals Table */}
-      <Card>
+      <Card className="min-w-0">
         <CardHeader className="pb-3">
           {/* Tabs */}
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 overflow-x-auto pb-2 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'bg-primary text-primary-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -375,29 +375,31 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="relative">
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="relative flex-1 md:flex-initial">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input 
                   placeholder="Search deals..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-8 w-48 text-sm"
+                  className="pl-9 h-8 w-full md:w-48 text-sm"
                 />
               </div>
-              <Button asChild size="sm" className="h-8 text-xs">
+              <Button asChild size="sm" className="h-8 text-xs whitespace-nowrap">
                 <Link href="/dashboard/deals/new">
                   <Plus size={14} className="mr-1.5" />
-                  New Deal
+                  <span className="hidden sm:inline">New Deal</span>
+                  <span className="sm:hidden">New</span>
                 </Link>
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
+        <CardContent className="p-0 overflow-x-auto">
+          <div className="min-w-[800px]">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
                 <TableHead className="w-8 pl-4">
                   <input type="checkbox" className="rounded border-border" />
                 </TableHead>
@@ -492,6 +494,7 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
               )}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
