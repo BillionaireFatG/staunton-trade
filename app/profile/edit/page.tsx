@@ -11,7 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Upload, CheckCircle2, Clock, XCircle, ArrowLeft } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2, Upload, CheckCircle2, Clock, XCircle, ArrowLeft, Camera, X as XIcon } from 'lucide-react';
 import type { UserRole } from '@/types/profile';
 
 export default function EditProfilePage() {
@@ -22,6 +23,9 @@ export default function EditProfilePage() {
   const [success, setSuccess] = useState(false);
   const [verificationDocs, setVerificationDocs] = useState<File[]>([]);
   const [requestingVerification, setRequestingVerification] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -52,6 +56,75 @@ export default function EditProfilePage() {
         ? prev.roles.filter(r => r !== role)
         : [...prev.roles, role],
     }));
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image must be less than 5MB');
+        return;
+      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile || !profile) return;
+
+    setUploadingAvatar(true);
+    setError(null);
+
+    try {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${profile.id}/avatar_${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, avatarFile, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      await updateProfile({ avatar_url: publicUrl });
+      await refreshProfile();
+
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload avatar');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!profile) return;
+    
+    setUploadingAvatar(true);
+    try {
+      await updateProfile({ avatar_url: null });
+      await refreshProfile();
+      setAvatarPreview(null);
+      setAvatarFile(null);
+    } catch (err: any) {
+      setError(err.message || 'Failed to remove avatar');
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,6 +229,102 @@ export default function EditProfilePage() {
           Profile updated successfully!
         </div>
       )}
+
+      {/* Avatar Upload Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Picture</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-start gap-6">
+            <div className="relative">
+              <Avatar className="w-32 h-32 border-4 border-border">
+                <AvatarImage src={avatarPreview || profile?.avatar_url || undefined} />
+                <AvatarFallback className="text-4xl bg-gradient-to-br from-primary to-primary/50 text-primary-foreground">
+                  {profile?.full_name?.substring(0, 2).toUpperCase() || 'ST'}
+                </AvatarFallback>
+              </Avatar>
+              {(avatarPreview || profile?.avatar_url) && !uploadingAvatar && (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
+                >
+                  <XIcon size={16} />
+                </button>
+              )}
+            </div>
+            <div className="flex-1 space-y-4">
+              <div>
+                <p className="text-sm font-medium mb-1">Upload a new profile picture</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  JPG, PNG or GIF. Max size 5MB. Recommended: 400x400px
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  disabled={uploadingAvatar}
+                >
+                  <label className="cursor-pointer">
+                    <Camera size={16} className="mr-2" />
+                    Choose Image
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                      disabled={uploadingAvatar}
+                    />
+                  </label>
+                </Button>
+                {avatarFile && (
+                  <>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAvatarUpload}
+                      disabled={uploadingAvatar}
+                    >
+                      {uploadingAvatar ? (
+                        <>
+                          <Loader2 size={16} className="mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={16} className="mr-2" />
+                          Upload
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setAvatarFile(null);
+                        setAvatarPreview(null);
+                      }}
+                      disabled={uploadingAvatar}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                )}
+              </div>
+              {avatarFile && (
+                <p className="text-xs text-muted-foreground">
+                  Selected: {avatarFile.name} ({(avatarFile.size / 1024).toFixed(1)} KB)
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
