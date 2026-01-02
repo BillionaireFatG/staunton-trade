@@ -305,53 +305,55 @@ export interface VoiceRoomMessage {
 }
 
 export async function getRoomMessages(roomId: string, limit = 50): Promise<VoiceRoomMessage[]> {
-  const { data, error } = await supabase
-    .from('voice_room_messages')
-    .select(`
-      *,
-      profile:profiles(
-        full_name,
-        avatar_url,
-        company_name,
-        verification_status
-      )
-    `)
-    .eq('room_id', roomId)
-    .order('created_at', { ascending: true })
-    .limit(limit);
+  try {
+    const { data, error } = await supabase
+      .from('voice_room_messages')
+      .select(`
+        *,
+        profile:profiles(
+          full_name,
+          avatar_url,
+          company_name,
+          verification_status
+        )
+      `)
+      .eq('room_id', roomId)
+      .order('created_at', { ascending: true })
+      .limit(limit);
 
-  if (error) {
-    console.error('Error fetching room messages:', error);
+    if (error) return [];
+    return data || [];
+  } catch {
     return [];
   }
-  return data || [];
 }
 
 export async function sendRoomMessage(roomId: string, userId: string, content: string): Promise<VoiceRoomMessage | null> {
-  const { data, error } = await supabase
-    .from('voice_room_messages')
-    .insert({
-      room_id: roomId,
-      user_id: userId,
-      content,
-      message_type: 'text',
-    })
-    .select(`
-      *,
-      profile:profiles(
-        full_name,
-        avatar_url,
-        company_name,
-        verification_status
-      )
-    `)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('voice_room_messages')
+      .insert({
+        room_id: roomId,
+        user_id: userId,
+        content,
+        message_type: 'text',
+      })
+      .select(`
+        *,
+        profile:profiles(
+          full_name,
+          avatar_url,
+          company_name,
+          verification_status
+        )
+      `)
+      .single();
 
-  if (error) {
-    console.error('Error sending message:', error);
+    if (error) return null;
+    return data;
+  } catch {
     return null;
   }
-  return data;
 }
 
 export function subscribeToRoomMessages(roomId: string, callback: (message: VoiceRoomMessage) => void) {
