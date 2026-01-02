@@ -84,20 +84,36 @@ export default function EditProfilePage() {
       const fileExt = avatarFile.name.split('.').pop();
       const fileName = `${profile.id}/avatar_${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      // Delete old avatar if exists
+      if (profile.avatar_url) {
+        const oldPath = profile.avatar_url.split('/avatars/')[1];
+        if (oldPath) {
+          await supabase.storage.from('avatars').remove([oldPath]);
+        }
+      }
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, avatarFile, {
           cacheControl: '3600',
-          upsert: false,
+          upsert: true,
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      await updateProfile({ avatar_url: publicUrl });
+      const updated = await updateProfile({ avatar_url: publicUrl });
+      
+      if (!updated) {
+        throw new Error('Failed to update profile with new avatar URL');
+      }
+
       await refreshProfile();
 
       setAvatarFile(null);
@@ -105,7 +121,8 @@ export default function EditProfilePage() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
-      setError(err.message || 'Failed to upload avatar');
+      console.error('Avatar upload error:', err);
+      setError(err.message || 'Failed to upload avatar. Please try again.');
     } finally {
       setUploadingAvatar(false);
     }
