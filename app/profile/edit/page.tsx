@@ -277,6 +277,11 @@ export default function EditProfilePage() {
                 <p className="text-xs text-muted-foreground mb-3">
                   JPG, PNG or GIF. Max size 5MB. Recommended: 400x400px
                 </p>
+                {error && error.includes('avatar') && (
+                  <div className="p-2 mb-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded">
+                    {error}
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button
