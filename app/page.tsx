@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Loader2 } from 'lucide-react';
 import Navigation from './components/landing/Navigation';
 import Hero from './components/landing/Hero';
 import Features from './components/landing/Features';
@@ -13,6 +14,7 @@ import Footer from './components/landing/Footer';
 
 export default function Home() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -27,15 +29,25 @@ export default function Home() {
           .single();
 
         if (!profile || !profile.full_name) {
-          router.push('/onboarding');
+          window.location.href = '/onboarding';
         } else {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
         }
+      } else {
+        setChecking(false);
       }
     };
 
     checkAuth();
   }, [router]);
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-900" />
+      </div>
+    );
+  }
 
   return (
     <main>
