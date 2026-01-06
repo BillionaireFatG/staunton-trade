@@ -78,8 +78,27 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/sign-in';
+    try {
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      
+      // Clear all auth-related data from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('staunton-auth-token');
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      
+      // Hard redirect to sign-in page
+      window.location.href = '/sign-in';
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Force redirect even if sign out fails
+      window.location.href = '/sign-in';
+    }
   };
 
   const navItems = [
