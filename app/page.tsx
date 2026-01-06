@@ -1,9 +1,6 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { Loader2 } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import Navigation from './components/landing/Navigation';
 import Hero from './components/landing/Hero';
 import Features from './components/landing/Features';
@@ -12,41 +9,43 @@ import Stats from './components/landing/Stats';
 import CTA from './components/landing/CTA';
 import Footer from './components/landing/Footer';
 
-export default function Home() {
-  const router = useRouter();
-  const [checking, setChecking] = useState(true);
+export default async function Home() {
+  const cookieStore = await cookies();
+  
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          } catch {}
+        },
+      },
+    }
+  );
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        // Check if profile is complete
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id, full_name')
-          .eq('id', session.user.id)
-          .single();
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (session) {
+    // Check if profile is complete
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .eq('id', session.user.id)
+      .single();
 
-        if (!profile || !profile.full_name) {
-          window.location.href = '/onboarding';
-        } else {
-          window.location.href = '/dashboard';
-        }
-      } else {
-        setChecking(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-  if (checking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="w-8 h-8 animate-spin text-neutral-900" />
-      </div>
-    );
+    if (!profile || !profile.full_name) {
+      redirect('/onboarding');
+    } else {
+      redirect('/dashboard');
+    }
   }
 
   return (
