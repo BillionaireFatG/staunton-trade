@@ -22,11 +22,22 @@ export default function SignIn() {
       setError('Email verification failed. Please try signing in or request a new verification email.');
     }
 
-    // Check existing session
+    // Check existing session and redirect appropriately
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        window.location.href = '/dashboard';
+        // Check if profile is complete
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!profile || !profile.full_name) {
+          window.location.href = '/onboarding';
+        } else {
+          window.location.href = '/dashboard';
+        }
       }
     };
     checkSession();
@@ -35,7 +46,18 @@ export default function SignIn() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          window.location.href = '/dashboard';
+          // Check if profile is complete before redirecting
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!profile || !profile.full_name) {
+            window.location.href = '/onboarding';
+          } else {
+            window.location.href = '/dashboard';
+          }
         }
       }
     );

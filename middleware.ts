@@ -21,7 +21,13 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
+            // Ensure cookies persist for 30 days
+            response.cookies.set(name, value, {
+              ...options,
+              maxAge: options?.maxAge || 60 * 60 * 24 * 30, // 30 days
+              sameSite: 'lax',
+              secure: process.env.NODE_ENV === 'production',
+            });
           });
         },
       },
@@ -42,6 +48,19 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/sign-in';
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Check if profile is complete, redirect to onboarding if not
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || !profile.full_name) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = '/onboarding';
       return NextResponse.redirect(redirectUrl);
     }
   }
