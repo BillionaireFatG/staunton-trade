@@ -452,7 +452,12 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
           .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching messages:', error);
+          setConversations([]);
+          setLoading(false);
+          return;
+        }
 
         // Group messages by conversation partner
         const conversationMap = new Map<string, ConversationType>();
@@ -462,11 +467,15 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
           
           if (!conversationMap.has(partnerId)) {
             // Get partner info
-            const { data: profile } = await supabase
+            const { data: profile, error: profileError } = await supabase
               .from('profiles')
               .select('company_name, full_name')
               .eq('id', partnerId)
               .single();
+            
+            if (profileError) {
+              console.error('Error fetching profile:', profileError);
+            }
             
             // Count unread messages from this partner
             const unreadCount = (messagesData || []).filter(
@@ -485,7 +494,7 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
 
         setConversations(Array.from(conversationMap.values()));
       } catch (error) {
-        // Silently handle - table might not exist yet
+        console.error('Error in fetchConversations:', error);
         setConversations([]);
       }
       setLoading(false);
