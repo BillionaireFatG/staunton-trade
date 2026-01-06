@@ -601,9 +601,12 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
   // Scroll to bottom on new messages
   React.useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const scrollContainer = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
     }
-  }, [messages]);
+  }, [messages, globalMessages]);
 
   const handleSelectConversation = (conv: ConversationType) => {
     setIsGlobalChat(false);
@@ -764,7 +767,7 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
 
       {/* Chat Area */}
       <div className={cn(
-        'flex-1 flex flex-col',
+        'flex-1 flex flex-col min-h-0',
         !showMobileChat && !selectedPartnerId && !isGlobalChat ? 'hidden md:flex' : 'flex'
       )}>
         {isGlobalChat ? (
