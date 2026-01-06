@@ -415,7 +415,7 @@ interface ChatSystemProps {
 }
 
 export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const currentUserId = user?.id || null;
   const [conversations, setConversations] = React.useState<ConversationType[]>([]);
   const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(initialPartnerId || null);
@@ -665,7 +665,8 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
     return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
   });
 
-  if (!currentUserId && loading) {
+  // Show loading while auth is loading or conversations are loading
+  if (authLoading || (!currentUserId && loading)) {
     return (
       <div className={cn('flex items-center justify-center h-full bg-background border rounded-xl', className)}>
         <Loader2 size={32} className="animate-spin text-muted-foreground" />
@@ -673,7 +674,8 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
     );
   }
 
-  if (!currentUserId) {
+  // If auth is done loading but no user, show error
+  if (!currentUserId && !authLoading) {
     return (
       <div className={cn('flex items-center justify-center h-full bg-background border rounded-xl', className)}>
         <div className="text-center">
