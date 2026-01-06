@@ -4,6 +4,7 @@ import * as React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/components/AuthProvider';
 import type { Message, Conversation as ConversationType, ChatUser } from '@/types/database';
 import {
   Send,
@@ -414,7 +415,8 @@ interface ChatSystemProps {
 }
 
 export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
-  const [currentUserId, setCurrentUserId] = React.useState<string | null>(null);
+  const { user } = useAuth();
+  const currentUserId = user?.id || null;
   const [conversations, setConversations] = React.useState<ConversationType[]>([]);
   const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(initialPartnerId || null);
   const [selectedPartner, setSelectedPartner] = React.useState<ChatUser | null>(null);
@@ -426,30 +428,6 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
   const [loading, setLoading] = React.useState(true);
   const [sendingMessage, setSendingMessage] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
-
-  // Get current user
-  React.useEffect(() => {
-    const getCurrentUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Error getting user:', error);
-          setLoading(false);
-          return;
-        }
-        if (user) {
-          setCurrentUserId(user.id);
-        } else {
-          console.error('No user found');
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Error in getCurrentUser:', error);
-        setLoading(false);
-      }
-    };
-    getCurrentUser();
-  }, []);
 
   // Fetch conversations
   React.useEffect(() => {
