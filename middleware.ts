@@ -21,13 +21,7 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
-            // Ensure cookies persist for 30 days
-            response.cookies.set(name, value, {
-              ...options,
-              maxAge: options?.maxAge || 60 * 60 * 24 * 30, // 30 days
-              sameSite: 'lax',
-              secure: process.env.NODE_ENV === 'production',
-            });
+            response.cookies.set(name, value, options);
           });
         },
       },

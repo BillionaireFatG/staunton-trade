@@ -78,44 +78,8 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
   }, []);
 
   const handleSignOut = async () => {
-    try {
-      console.log('Sign out initiated...');
-      
-      // Sign out from Supabase
-      await supabase.auth.signOut({ scope: 'local' });
-      
-      // Clear all auth-related data from localStorage and sessionStorage
-      if (typeof window !== 'undefined') {
-        // Clear localStorage
-        localStorage.removeItem('staunton-auth-token');
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
-            localStorage.removeItem(key);
-          }
-        });
-        
-        // Clear sessionStorage
-        Object.keys(sessionStorage).forEach(key => {
-          if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
-            sessionStorage.removeItem(key);
-          }
-        });
-        
-        // Clear all cookies
-        document.cookie.split(";").forEach((c) => {
-          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-        });
-      }
-      
-      console.log('Sign out complete, redirecting...');
-      
-      // Hard redirect to sign-in page with cache bust
-      window.location.href = '/sign-in?t=' + Date.now();
-    } catch (error) {
-      console.error('Error signing out:', error);
-      // Force redirect even if sign out fails
-      window.location.href = '/sign-in?t=' + Date.now();
-    }
+    await supabase.auth.signOut();
+    window.location.href = '/sign-in';
   };
 
   const navItems = [

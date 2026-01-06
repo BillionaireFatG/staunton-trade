@@ -23,13 +23,7 @@ export async function createServerClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            // Ensure cookies persist for 30 days
-            cookieStore.set(name, value, {
-              ...options,
-              maxAge: options?.maxAge || 60 * 60 * 24 * 30, // 30 days
-              sameSite: 'lax',
-              secure: process.env.NODE_ENV === 'production',
-            });
+            cookieStore.set(name, value, options);
           });
         } catch (error) {
           // The `setAll` method was called from a Server Component.
