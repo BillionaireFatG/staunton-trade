@@ -11,9 +11,21 @@ export default function SignOutButton() {
   const handleSignOut = async () => {
     setLoading(true);
     try {
+      // Sign out from Supabase
       await supabase.auth.signOut();
-      router.push('/sign-in');
-      router.refresh();
+      
+      // Clear all auth-related data from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('staunton-auth-token');
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      
+      // Hard redirect to sign-in page
+      window.location.href = '/sign-in';
     } catch (error) {
       console.error('Error signing out:', error);
       setLoading(false);
