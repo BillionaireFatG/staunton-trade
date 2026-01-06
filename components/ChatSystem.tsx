@@ -601,10 +601,7 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
   // Scroll to bottom on new messages
   React.useEffect(() => {
     if (scrollRef.current) {
-      const scrollContainer = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, globalMessages]);
 
@@ -691,10 +688,10 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
   }
 
   return (
-    <div className={cn('flex h-full bg-background border rounded-xl overflow-hidden', className)}>
+    <div className="flex h-full bg-background border rounded-xl overflow-hidden">
       {/* Sidebar - Conversation List */}
       <div className={cn(
-        'w-80 border-r border-border flex flex-col bg-card',
+        'w-80 border-r border-border flex flex-col bg-card shrink-0',
         showMobileChat ? 'hidden md:flex' : 'flex'
       )}>
         {/* Search Header */}
@@ -767,13 +764,13 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
 
       {/* Chat Area */}
       <div className={cn(
-        'flex-1 flex flex-col min-h-0',
+        'flex-1 flex flex-col overflow-hidden',
         !showMobileChat && !selectedPartnerId && !isGlobalChat ? 'hidden md:flex' : 'flex'
       )}>
         {isGlobalChat ? (
           <>
             {/* Global Chat Header */}
-            <div className="h-16 px-4 border-b border-border flex items-center gap-3 bg-card">
+            <div className="h-16 px-4 border-b border-border flex items-center gap-3 bg-card shrink-0">
               <Button variant="ghost" size="icon" className="md:hidden h-8 w-8" onClick={() => setShowMobileChat(false)}>
                 <ChevronLeft size={18} />
               </Button>
@@ -789,7 +786,7 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
             </div>
 
             {/* Global Messages */}
-            <ScrollArea className="flex-1" ref={scrollRef}>
+            <div className="flex-1 overflow-y-auto" ref={scrollRef}>
               <div className="py-4 space-y-3">
                 {globalMessages.map((msg, index) => {
                   const isOwn = msg.sender_id === currentUserId;
@@ -844,9 +841,11 @@ export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemPr
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
 
-            <MessageInput onSend={handleSendMessage} loading={sendingMessage} />
+            <div className="shrink-0">
+              <MessageInput onSend={handleSendMessage} loading={sendingMessage} />
+            </div>
           </>
         ) : selectedPartnerId && selectedPartner ? (
           <>
