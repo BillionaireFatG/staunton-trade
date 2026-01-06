@@ -308,23 +308,20 @@ function NewMessageDialog({ onStartConversation }: NewMessageDialogProps) {
     
     setLoading(true);
     try {
-      // Search for users by email
+      // Search for users by company name
       const { data, error } = await supabase
-        .from('user_profiles')
-        .select('user_id, company_name')
+        .from('profiles')
+        .select('id, company_name, full_name, email')
         .ilike('company_name', `%${query}%`)
         .limit(10);
       
       if (error) throw error;
       
-      // Get user emails from auth
-      const userIds = data?.map(d => d.user_id) || [];
-      
-      // For now, just show the company names as we don't have easy access to auth emails
+      // Map to ChatUser format
       setUsers(data?.map(d => ({
-        id: d.user_id,
-        email: d.company_name || 'Unknown',
-        name: d.company_name,
+        id: d.id,
+        email: d.email || 'Unknown',
+        name: d.full_name || d.company_name || 'Unknown',
       })) || []);
     } catch (error) {
       console.error('Error searching users:', error);
@@ -466,9 +463,9 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
           if (!conversationMap.has(partnerId)) {
             // Get partner info
             const { data: profile } = await supabase
-              .from('user_profiles')
-              .select('company_name')
-              .eq('user_id', partnerId)
+              .from('profiles')
+              .select('company_name, full_name')
+              .eq('id', partnerId)
               .single();
             
             // Count unread messages from this partner
@@ -478,7 +475,7 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
 
             conversationMap.set(partnerId, {
               partner_id: partnerId,
-              partner_name: profile?.company_name || undefined,
+              partner_name: profile?.full_name || profile?.company_name || undefined,
               last_message: msg.message_text,
               last_message_at: msg.created_at,
               unread_count: unreadCount,
@@ -579,15 +576,15 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
 
         // Get partner info
         const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('company_name')
-          .eq('user_id', selectedPartnerId)
+          .from('profiles')
+          .select('company_name, full_name, email')
+          .eq('id', selectedPartnerId)
           .single();
 
         setSelectedPartner({
           id: selectedPartnerId,
-          email: profile?.company_name || 'Unknown',
-          name: profile?.company_name,
+          email: profile?.email || 'Unknown',
+          name: profile?.full_name || profile?.company_name || 'Unknown',
         });
       } catch (error) {
         console.error('Error fetching messages:', error);
