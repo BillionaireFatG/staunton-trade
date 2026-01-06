@@ -430,9 +430,22 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
   // Get current user
   React.useEffect(() => {
     const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserId(user.id);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Error getting user:', error);
+          setLoading(false);
+          return;
+        }
+        if (user) {
+          setCurrentUserId(user.id);
+        } else {
+          console.error('No user found');
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error in getCurrentUser:', error);
+        setLoading(false);
       }
     };
     getCurrentUser();
@@ -671,10 +684,21 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
     return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
   });
 
-  if (!currentUserId) {
+  if (!currentUserId && loading) {
     return (
       <div className={cn('flex items-center justify-center h-full bg-background border rounded-xl', className)}>
         <Loader2 size={32} className="animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!currentUserId) {
+    return (
+      <div className={cn('flex items-center justify-center h-full bg-background border rounded-xl', className)}>
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Unable to load messages</p>
+          <p className="text-sm text-muted-foreground">Please try refreshing the page</p>
+        </div>
       </div>
     );
   }
