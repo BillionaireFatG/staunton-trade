@@ -1,39 +1,14 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { createServerClient } from '@/lib/supabase-server';
+import MessagesClient from './MessagesClient';
 
-import { useEffect, useState } from 'react';
-import { ChatSystem } from '@/components/ChatSystem';
-import { useAuth } from '@/components/AuthProvider';
-import { Loader2 } from 'lucide-react';
+export default async function MessagesPage() {
+  const supabase = await createServerClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-export default function MessagesPage() {
-  const { user, loading } = useAuth();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || loading) {
-    return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-muted-foreground" />
-      </div>
-    );
+  if (authError || !user) {
+    redirect('/sign-in');
   }
 
-  if (!user) {
-    return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Please sign in to view messages</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-[calc(100vh-8rem)]">
-      <ChatSystem className="h-full" />
-    </div>
-  );
+  return <MessagesClient userId={user.id} />;
 }

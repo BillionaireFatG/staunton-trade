@@ -4,7 +4,6 @@ import * as React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/components/AuthProvider';
 import type { Message, Conversation as ConversationType, ChatUser } from '@/types/database';
 import {
   Send,
@@ -412,11 +411,11 @@ function NewMessageDialog({ onStartConversation }: NewMessageDialogProps) {
 interface ChatSystemProps {
   className?: string;
   initialPartnerId?: string;
+  userId?: string;
 }
 
-export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
-  const { user, loading: authLoading } = useAuth();
-  const currentUserId = user?.id || null;
+export function ChatSystem({ className, initialPartnerId, userId }: ChatSystemProps) {
+  const currentUserId = userId || null;
   const [conversations, setConversations] = React.useState<ConversationType[]>([]);
   const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(initialPartnerId || null);
   const [selectedPartner, setSelectedPartner] = React.useState<ChatUser | null>(null);
@@ -665,8 +664,8 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
     return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
   });
 
-  // Show loading while auth is loading or conversations are loading
-  if (authLoading || (!currentUserId && loading)) {
+  // Show loading while conversations are loading
+  if (loading) {
     return (
       <div className={cn('flex items-center justify-center h-full bg-background border rounded-xl', className)}>
         <Loader2 size={32} className="animate-spin text-muted-foreground" />
@@ -674,8 +673,8 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
     );
   }
 
-  // If auth is done loading but no user, show error
-  if (!currentUserId && !authLoading) {
+  // If no user, show error
+  if (!currentUserId) {
     return (
       <div className={cn('flex items-center justify-center h-full bg-background border rounded-xl', className)}>
         <div className="text-center">
