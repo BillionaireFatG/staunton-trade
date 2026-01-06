@@ -431,7 +431,10 @@ export function ChatSystem({ className, initialPartnerId }: ChatSystemProps) {
 
   // Fetch conversations
   React.useEffect(() => {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+      setLoading(false);
+      return;
+    }
 
     const fetchConversations = async () => {
       setLoading(true);
