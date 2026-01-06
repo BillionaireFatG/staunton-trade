@@ -8,8 +8,8 @@ interface MessagesClientProps {
 
 export default function MessagesClient({ userId }: MessagesClientProps) {
   return (
-    <div className="h-[calc(100vh-8rem)]">
-      <ChatSystem className="h-full" userId={userId} />
+    <div className="w-full" style={{ height: 'calc(100vh - 12rem)' }}>
+      <ChatSystem className="h-full w-full" userId={userId} />
     </div>
   );
 }
