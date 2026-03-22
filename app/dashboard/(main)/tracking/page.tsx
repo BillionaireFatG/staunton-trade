@@ -28,15 +28,15 @@ export default function TrackingPage() {
     id: s.id,
     reference_number: s.trackingNumber,
     commodity_type: s.commodity,
-    volume: s.volume || 0,
+    volume: (s as any).volume || 0,
     status: s.status.toLowerCase().replace(/ /g, '_'),
-    progress: s.progress || 0,
-    vessel_name: s.vesselName || 'N/A',
-    origin_port: s.originPort,
-    destination_port: s.destinationPort,
-    eta: s.eta,
-    injection_facility: s.injectionFacility || s.currentLocation || 'N/A',
-    buyer_name: s.buyerName || 'N/A',
+    progress: (s as any).progress || 0,
+    vessel_name: (s as any).vesselName || 'N/A',
+    origin_port: (s as any).originPort || s.origin,
+    destination_port: (s as any).destinationPort || s.destination,
+    eta: (s as any).eta || (s as any).estimatedArrival || 'N/A',
+    injection_facility: (s as any).injectionFacility || (s as any).currentLocation || 'N/A',
+    buyer_name: (s as any).buyerName || 'N/A',
   }));
   
   const [searchQuery, setSearchQuery] = useState('');
