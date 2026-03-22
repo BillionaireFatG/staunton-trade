@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import DashboardClient from '../DashboardClient'
+import DashboardClient from '../../DashboardClient'
 import type { Deal } from '@/types/database'
 import { Activity, Loader2 } from 'lucide-react'
 
