@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import DashboardClient from '../../DashboardClient'
+import DashboardClient from '../DashboardClient'
 import type { Deal } from '@/types/database'
 import { Activity, Loader2 } from 'lucide-react'
 
@@ -45,12 +45,6 @@ export default function ActiveDealsPage() {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
-  }
-
-  const dealsData: Deal[] = deals || [];
-
-  if (dealsError) {
-    console.error('Error fetching deals:', dealsError);
   }
 
   const dealsData: Deal[] = deals || [];
