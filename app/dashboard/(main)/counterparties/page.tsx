@@ -188,7 +188,7 @@ export default function CounterpartiesPage() {
     recentTrend: (c.recentTrend || 'stable') as 'up' | 'down' | 'stable',
     badges: c.badges || [],
     lastActive: c.lastActive || '1 day ago',
-    hasWarning: c.hasWarning || false,
+    hasWarning: false,
   }));
   
   const [searchQuery, setSearchQuery] = React.useState('');

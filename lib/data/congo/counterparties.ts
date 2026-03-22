@@ -15,8 +15,6 @@ export const congoCounterparties = [
     memberSince: '2021-01-15',
     certifications: ['CEEC Certified', 'ARECOMS Registered', 'NCE-ECS Founding Member'],
     successRate: 98,
-    isVerified: true,
-    hasWarning: false,
     recentTrend: 'up' as const,
     badges: ['Premium Supplier', 'State Entity'],
     lastActive: '2024-03-20'
@@ -37,8 +35,6 @@ export const congoCounterparties = [
     memberSince: '2022-06-20',
     certifications: ['CEEC E-trace Verified', 'OECD Due Diligence Compliant'],
     successRate: 94,
-    isVerified: true,
-    hasWarning: false,
     recentTrend: 'stable' as const,
     badges: ['Cooperative', 'OECD Compliant'],
     lastActive: '2024-03-21'
@@ -59,8 +55,6 @@ export const congoCounterparties = [
     memberSince: '2023-02-10',
     certifications: ['FSC Certified', 'Ministry of Environment Approved'],
     successRate: 92,
-    isVerified: true,
-    hasWarning: false,
     recentTrend: 'up' as const,
     badges: ['Sustainable', 'FSC Certified'],
     lastActive: '2024-03-18'
@@ -81,8 +75,6 @@ export const congoCounterparties = [
     memberSince: '2023-05-18',
     certifications: ['ITSCI Tagged', 'Conflict-Free Certified', 'CEEC Registered'],
     successRate: 89,
-    isVerified: true,
-    hasWarning: false,
     recentTrend: 'up' as const,
     badges: ['Conflict-Free', 'ITSCI'],
     lastActive: '2024-03-19'
@@ -103,8 +95,6 @@ export const congoCounterparties = [
     memberSince: '2023-09-01',
     certifications: ['CEEC Certified', 'Conflict-Free Gold', 'LBMA Responsible Sourcing'],
     successRate: 87,
-    isVerified: true,
-    hasWarning: false,
     recentTrend: 'stable' as const,
     badges: ['Conflict-Free', 'LBMA'],
     lastActive: '2024-03-20'
@@ -125,8 +115,6 @@ export const congoCounterparties = [
     memberSince: '2022-11-05',
     certifications: ['Kimberley Process Certified', 'CEEC Registered'],
     successRate: 95,
-    isVerified: true,
-    hasWarning: false,
     recentTrend: 'stable' as const,
     badges: ['Kimberley Process', 'Premium'],
     lastActive: '2024-03-22'
