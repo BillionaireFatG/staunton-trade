@@ -102,7 +102,7 @@ function StatsCards() {
 }
 
 // Counterparty Detail Dialog
-function CounterpartyDetailDialog({ counterparty }: { counterparty: typeof SAMPLE_COUNTERPARTIES[0] }) {
+function CounterpartyDetailDialog({ counterparty }: { counterparty: any }) {
   return (
     <DialogContent className="max-w-2xl">
       <DialogHeader>
