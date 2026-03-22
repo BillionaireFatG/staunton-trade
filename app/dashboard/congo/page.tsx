@@ -367,16 +367,16 @@ export default function CongoOverviewPage() {
                 {congoDealsData.slice(0, 5).map((deal: any) => (
                   <TableRow key={deal.id} className="group">
                     <TableCell className="font-medium">
-                      {deal.commodity.charAt(0).toUpperCase() + deal.commodity.slice(1)}
+                      {deal.commodity_type.charAt(0).toUpperCase() + deal.commodity_type.slice(1)}
                     </TableCell>
                     <TableCell>
-                      {deal.quantity.toLocaleString()} {deal.quantity_unit}
+                      {deal.volume.toLocaleString()} {deal.volume_unit}
                     </TableCell>
                     <TableCell>
-                      {formatCurrency(deal.price_per_unit)}/{deal.quantity_unit}
+                      {formatCurrency(deal.price_per_unit)}/{deal.volume_unit}
                     </TableCell>
                     <TableCell className="font-semibold">
-                      {formatCurrency(deal.price_per_unit * deal.quantity)}
+                      {formatCurrency(deal.total_value)}
                     </TableCell>
                     <TableCell>{getStatusBadge(deal.status)}</TableCell>
                     <TableCell className="max-w-[300px]">
