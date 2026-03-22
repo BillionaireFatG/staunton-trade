@@ -68,14 +68,14 @@ export default function MarketPage() {
   const mockPriceData = marketData.commodities.map(c => ({
     commodity: c.name,
     symbol: c.symbol,
-    region: c.region || c.source,
+    region: (c as any).region || c.source,
     price: c.currentPrice,
     change24h: c.change,
     changePercent: c.changePercent,
-    high24h: c.high24h || c.currentPrice * 1.02,
-    low24h: c.low24h || c.currentPrice * 0.98,
-    volume: c.volume,
-    icon: iconMap[c.icon] || Fuel,
+    high24h: (c as any).high24h || c.currentPrice * 1.02,
+    low24h: (c as any).low24h || c.currentPrice * 0.98,
+    volume: (c as any).volume || 'N/A',
+    icon: iconMap[(c as any).icon] || Fuel,
   }));
 
   const handleRefresh = () => {
