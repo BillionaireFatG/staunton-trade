@@ -17,6 +17,7 @@ import {
   TrendingUp,
   DollarSign
 } from 'lucide-react';
+import { useTradeEnvironment } from '@/lib/contexts/trade-environment-context';
 
 // Commodity trading hotspots with real coordinates - Expanded list
 const COMMODITY_HOTSPOTS = [
@@ -80,6 +81,24 @@ const COMMODITY_HOTSPOTS = [
   { id: 50, name: 'Hong Kong', country: 'China', lat: 22.3193, lon: 114.1694, type: 'trading', volume: 'Financial Hub', commodity: 'Multi-Commodity', color: '#ec4899' },
 ];
 
+// Congo-specific commodity hotspots
+const CONGO_HOTSPOTS = [
+  { id: 101, name: 'Kinshasa', country: 'DRC', lat: -4.3317, lon: 15.3139, type: 'trading', volume: 'Capital Hub', commodity: 'Multi-Commodity', color: '#3b82f6' },
+  { id: 102, name: 'Lubumbashi', country: 'DRC', lat: -11.6667, lon: 27.4667, type: 'mining', volume: '50K MT/year', commodity: 'Copper & Cobalt', color: '#10b981' },
+  { id: 103, name: 'Kolwezi', country: 'DRC', lat: -10.7167, lon: 25.4667, type: 'mining', volume: '30K MT/year', commodity: 'Cobalt', color: '#f59e0b' },
+  { id: 104, name: 'Goma', country: 'DRC', lat: -1.6740, lon: 29.2249, type: 'export', volume: '5K MT/year', commodity: 'Coltan', color: '#ef4444' },
+  { id: 105, name: 'Bukavu', country: 'DRC', lat: -2.5074, lon: 28.8476, type: 'export', volume: '2K MT/year', commodity: 'Gold', color: '#8b5cf6' },
+  { id: 106, name: 'Matadi Port', country: 'DRC', lat: -5.8181, lon: 13.4531, type: 'port', volume: '60K MT/year', commodity: 'Copper Export', color: '#ec4899' },
+  { id: 107, name: 'Pointe-Noire', country: 'Republic of Congo', lat: -4.7957, lon: 11.8636, type: 'port', volume: '20K m3/year', commodity: 'Timber', color: '#06b6d4' },
+  { id: 108, name: 'Mbuji-Mayi', country: 'DRC', lat: -6.1361, lon: 23.5897, type: 'mining', volume: '15K carats/year', commodity: 'Diamonds', color: '#84cc16' },
+  { id: 109, name: 'Brazzaville', country: 'Republic of Congo', lat: -4.2634, lon: 15.2429, type: 'trading', volume: 'Trading Hub', commodity: 'Agricultural', color: '#f97316' },
+  // Major export destinations
+  { id: 2, name: 'Rotterdam', country: 'Netherlands', lat: 51.9244, lon: 4.4777, type: 'hub', volume: 'Import Hub', commodity: 'Copper', color: '#10b981' },
+  { id: 3, name: 'Singapore', country: 'Singapore', lat: 1.3521, lon: 103.8198, type: 'hub', volume: 'Import Hub', commodity: 'Minerals', color: '#f59e0b' },
+  { id: 6, name: 'Shanghai', country: 'China', lat: 31.2304, lon: 121.4737, type: 'import', volume: 'Major Import', commodity: 'Copper & Cobalt', color: '#ec4899' },
+  { id: 18, name: 'Antwerp', country: 'Belgium', lat: 51.2194, lon: 4.4025, type: 'hub', volume: 'Processing', commodity: 'Cobalt', color: '#10b981' },
+];
+
 // Trade routes connecting major hubs
 const TRADE_ROUTES = [
   // Oil Routes
@@ -115,6 +134,27 @@ const TRADE_ROUTES = [
   { from: 47, to: 22, active: false }, // Escondida to Ningbo
 ];
 
+// Congo-specific trade routes
+const CONGO_TRADE_ROUTES = [
+  // Copper & Cobalt exports from Katanga region
+  { from: 102, to: 106, active: true }, // Lubumbashi to Matadi Port
+  { from: 103, to: 106, active: true }, // Kolwezi to Matadi Port
+  { from: 106, to: 2, active: true }, // Matadi to Rotterdam
+  { from: 106, to: 18, active: true }, // Matadi to Antwerp
+  { from: 106, to: 6, active: true }, // Matadi to Shanghai
+  // Coltan & Gold exports from Eastern DRC
+  { from: 104, to: 3, active: true }, // Goma to Singapore
+  { from: 105, to: 18, active: true }, // Bukavu to Antwerp
+  // Timber exports from Congo Basin
+  { from: 107, to: 6, active: true }, // Pointe-Noire to Shanghai
+  { from: 107, to: 2, active: false }, // Pointe-Noire to Rotterdam
+  // Diamonds from Kasai
+  { from: 108, to: 18, active: true }, // Mbuji-Mayi to Antwerp
+  // Internal DRC routes
+  { from: 101, to: 102, active: false }, // Kinshasa to Lubumbashi
+  { from: 102, to: 103, active: true }, // Lubumbashi to Kolwezi
+];
+
 interface GeoFeature {
   type: string;
   geometry: any;
@@ -141,15 +181,21 @@ interface CommodityGlobeProps {
 }
 
 export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlobeProps) {
+  const { environment } = useTradeEnvironment();
+  
+  // Select data based on environment
+  const hotspots = environment === 'congo' ? CONGO_HOTSPOTS : COMMODITY_HOTSPOTS;
+  const tradeRoutes = environment === 'congo' ? CONGO_TRADE_ROUTES : TRADE_ROUTES;
+  
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [worldData, setWorldData] = useState<GeoFeature[]>([]);
-  const [rotation, setRotation] = useState<[number, number]>([-20, -10]);
+  const [rotation, setRotation] = useState<[number, number]>(environment === 'congo' ? [20, -5] : [-20, -10]);
   const [isDragging, setIsDragging] = useState(false);
   const [lastMouse, setLastMouse] = useState<[number, number]>([0, 0]);
-  const [selectedHotspot, setSelectedHotspot] = useState<typeof COMMODITY_HOTSPOTS[0] | null>(null);
+  const [selectedHotspot, setSelectedHotspot] = useState<typeof hotspots[0] | null>(null);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -349,9 +395,9 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
       .attr('stroke-width', 0.3);
 
     // Trade routes
-    TRADE_ROUTES.forEach(route => {
-      const fromSpot = COMMODITY_HOTSPOTS.find(h => h.id === route.from);
-      const toSpot = COMMODITY_HOTSPOTS.find(h => h.id === route.to);
+    tradeRoutes.forEach(route => {
+      const fromSpot = hotspots.find(h => h.id === route.from);
+      const toSpot = hotspots.find(h => h.id === route.to);
       if (!fromSpot || !toSpot) return;
 
       const fromCoords = projection([fromSpot.lon, fromSpot.lat]);
@@ -387,7 +433,7 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
     });
 
     // Hotspots - limit to top 25 for performance
-    const visibleHotspots = COMMODITY_HOTSPOTS.slice(0, 25);
+    const visibleHotspots = hotspots.slice(0, 25);
     
     visibleHotspots.forEach((spot) => {
       const coords = projection([spot.lon, spot.lat]);
@@ -512,17 +558,19 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
         <div className="w-full h-[500px] rounded-2xl bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 flex items-center justify-center">
           <div className="text-center max-w-md px-4">
             <Globe2 size={64} className="text-neutral-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Global Commodity Network</h3>
+            <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+              {environment === 'congo' ? 'DRC Commodity Network' : 'Global Commodity Network'}
+            </h3>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4">
-              Track real-time commodity flows across {COMMODITY_HOTSPOTS.length}+ major trading hubs worldwide.
+              Track real-time commodity flows across {hotspots.length}+ major trading hubs {environment === 'congo' ? 'in DRC and export destinations' : 'worldwide'}.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
-              {COMMODITY_HOTSPOTS.slice(0, 8).map((spot) => (
+              {hotspots.slice(0, 8).map((spot) => (
                 <Badge key={spot.id} variant="secondary" className="text-xs">
                   {spot.name}
                 </Badge>
               ))}
-              <Badge variant="outline" className="text-xs">+{COMMODITY_HOTSPOTS.length - 8} more</Badge>
+              <Badge variant="outline" className="text-xs">+{hotspots.length - 8} more</Badge>
             </div>
           </div>
         </div>
@@ -621,7 +669,7 @@ export function CommodityGlobe({ className = '', onHotspotClick }: CommodityGlob
         <div className="bg-card/95 backdrop-blur-sm border border-border rounded-full px-4 py-2 flex items-center gap-2 shadow-lg">
           <Zap size={14} className="text-primary animate-pulse" />
           <span className="text-sm font-medium text-foreground">
-            {TRADE_ROUTES.filter(r => r.active).length} Active Routes
+            {tradeRoutes.filter(r => r.active).length} Active Routes
           </span>
         </div>
         

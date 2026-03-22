@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { useTradeEnvironment } from '@/lib/contexts/trade-environment-context';
+import { useMemo } from 'react';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -10,12 +12,14 @@ interface LogoProps {
 }
 
 export function Logo({ size = 'md', showText = false, className = '', variant = 'auto' }: LogoProps) {
-  const sizes = {
+  const { environmentName } = useTradeEnvironment();
+  
+  const sizes = useMemo(() => ({
     sm: { logo: 44, text: 'text-sm' },
     md: { logo: 56, text: 'text-lg' },
     lg: { logo: 75, text: 'text-xl' },
     xl: { logo: 115, text: 'text-2xl' },
-  };
+  }), []);
 
   const { logo } = sizes[size];
 
@@ -27,7 +31,7 @@ export function Logo({ size = 'md', showText = false, className = '', variant = 
       >
         <Image
           src="/logo5.png"
-          alt="Staunton Trade"
+          alt={environmentName}
           fill
           className="object-cover"
           style={{ color: 'rgba(253, 252, 252, 0)' }}
@@ -36,7 +40,7 @@ export function Logo({ size = 'md', showText = false, className = '', variant = 
         />
       </div>
       <span className={`font-bold text-neutral-900 ${sizes[size].text}`}>
-        STAUNTON TRADE
+        {environmentName.toUpperCase()}
       </span>
     </div>
   );

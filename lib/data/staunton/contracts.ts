@@ -1,0 +1,53 @@
+export const stauntonContracts = [
+  {
+    id: 'FRC-2024-0012',
+    title: 'Diesel Fixed Rate Contract',
+    commodity: 'Diesel',
+    type: 'Fixed Price',
+    lockedPrice: 725.50,
+    marketPrice: 758.20,
+    volume: '2.5M MT',
+    volumeAllocated: 2500000,
+    volumeUsed: 1875000,
+    priceType: 'Fixed Price',
+    startDate: '2024-12-01',
+    endDate: '2024-12-31',
+    status: 'active' as const,
+    savings: 81750,
+    location: 'ARA Hub'
+  },
+  {
+    id: 'FRC-2024-0011',
+    title: 'Jet Fuel Fixed Rate Contract',
+    commodity: 'Jet Fuel',
+    type: 'Fixed Price',
+    lockedPrice: 892.00,
+    marketPrice: 915.40,
+    volume: '1.0M MT',
+    volumeAllocated: 1000000,
+    volumeUsed: 450000,
+    priceType: 'Fixed Price',
+    startDate: '2024-12-01',
+    endDate: '2024-12-31',
+    status: 'active' as const,
+    savings: 10530,
+    location: 'Singapore Hub'
+  },
+  {
+    id: 'FRC-2024-0008',
+    title: 'Gasoline Fixed Rate Contract',
+    commodity: 'Gasoline',
+    type: 'Fixed Price',
+    lockedPrice: 680.25,
+    marketPrice: 695.80,
+    volume: '500K MT',
+    volumeAllocated: 500000,
+    volumeUsed: 500000,
+    priceType: 'Fixed Price',
+    startDate: '2024-11-01',
+    endDate: '2024-11-30',
+    status: 'completed' as const,
+    savings: 7775,
+    location: 'US Gulf'
+  }
+]
