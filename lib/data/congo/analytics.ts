@@ -54,6 +54,15 @@ export const congoAnalytics = {
     { name: 'Diamonds', percentage: 3, value: 16000000, authority: 'Kimberley certified' },
     { name: 'Other (Timber, Agricultural)', percentage: 3, value: 15000000, authority: 'Multi-ministry' }
   ],
+  weeklyTrends: [
+    { name: 'Mon', current: 11200, previous: 9800 },
+    { name: 'Tue', current: 13800, previous: 11500 },
+    { name: 'Wed', current: 10900, previous: 12100 },
+    { name: 'Thu', current: 14500, previous: 13200 },
+    { name: 'Fri', current: 16800, previous: 14900 },
+    { name: 'Sat', current: 7800, previous: 6500 },
+    { name: 'Sun', current: 5600, previous: 4800 }
+  ],
   statistics: {
     totalVolume: '77,550 MT',
     totalValue: '$531M',
@@ -70,5 +79,11 @@ export const congoAnalytics = {
     { ministry: 'Ministry of Agriculture', commodities: ['Palm Oil', 'Coffee', 'Cocoa'], percentage: 8 },
     { ministry: 'Ministry of Environment', commodities: ['Timber', 'Carbon Credits'], percentage: 6 },
     { ministry: 'Ministry of Hydrocarbons', commodities: ['Crude Oil', 'Natural Gas'], percentage: 4 }
+  ],
+  performanceMetrics: [
+    { name: 'CEEC Compliance', value: 94, target: 90 },
+    { name: 'NCE-ECS Coverage', value: 65, target: 75 },
+    { name: 'Export Certification', value: 88, target: 85 },
+    { name: 'Traceability (ITSCI)', value: 82, target: 80 }
   ]
 }
