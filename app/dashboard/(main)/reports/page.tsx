@@ -26,15 +26,15 @@ export default function ReportsPage() {
   
   const mockReports = reportsData.map(r => ({
     id: r.reportNumber,
-    deal_id: r.dealId || r.reportNumber,
-    type: r.type || 'vessel_to_tank',
+    deal_id: (r as any).dealId || r.reportNumber,
+    type: (r as any).type || 'vessel_to_tank',
     status: r.status.toLowerCase(),
     commodity: r.commodity,
-    volume: r.volume,
+    volume: (r as any).volume || 0,
     buyer: r.buyer,
     seller: r.supplier,
-    generated_at: r.generatedAt || r.inspectionDate + 'T10:00:00Z',
-    value: r.value || r.volume * 850,
+    generated_at: (r as any).generatedAt || r.inspectionDate + 'T10:00:00Z',
+    value: (r as any).value || 0,
   }));
   
   const [searchQuery, setSearchQuery] = useState('');
