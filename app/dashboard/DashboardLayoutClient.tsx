@@ -1,9 +1,8 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { 
-  Building2,
   LayoutDashboard, 
   Briefcase, 
   MessageSquare, 
@@ -18,19 +17,40 @@ import {
   Gift,
   Plus,
   MoreHorizontal,
-  Bell
+  Bell,
+  Search,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { ThemeCustomizer } from '@/components/ThemeCustomizer';
+import { LogoIcon } from '@/components/Logo';
 
 interface DashboardLayoutClientProps {
   children: ReactNode;
+}
+
+function useEstClock() {
+  const [time, setTime] = useState('');
+  const tick = useCallback(() => {
+    setTime(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+      }).format(new Date())
+    );
+  }, []);
+  useEffect(() => {
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [tick]);
+  return time;
 }
 
 export default function DashboardLayoutClient({ children }: DashboardLayoutClientProps) {
   const pathname = usePathname();
   const [userEmail, setUserEmail] = useState<string>('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const estTime = useEstClock();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -73,10 +93,8 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
       <aside className="fixed left-0 top-0 bottom-0 w-60 z-50 border-r border-border bg-card hidden md:flex flex-col">
         {/* Logo */}
         <div className="h-14 flex items-center px-4 border-b border-border flex-shrink-0">
-          <a href="/dashboard" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <Building2 size={14} className="text-primary-foreground" />
-            </div>
+          <a href="/dashboard" className="flex items-center gap-2.5">
+            <LogoIcon size={28} className="rounded-lg" />
             <span className="font-semibold text-foreground">Staunton Trade</span>
           </a>
         </div>
@@ -200,17 +218,53 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
       {/* Main Content */}
       <div className="md:pl-60">
         {/* Top Header */}
-        <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/95 backdrop-blur hidden md:flex items-center justify-between px-6">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-foreground">
-              {pathname === '/dashboard' ? 'Dashboard' : 
-               pathname?.split('/').pop()?.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase()) || 'Dashboard'}
-            </span>
+        <header className="sticky top-0 z-40 h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 hidden md:flex items-center gap-4 px-5">
+
+          {/* Page title */}
+          <span className="text-sm font-semibold text-foreground flex-shrink-0">
+            {pathname === '/dashboard' ? 'Dashboard' :
+             pathname?.split('/').pop()?.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Dashboard'}
+          </span>
+
+          {/* Search */}
+          <div className="flex-1 max-w-sm">
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search deals, counterparties, documents…"
+                className="w-full h-8 pl-8 pr-10 text-[13px] bg-muted/40 border border-border/60 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground/40 transition-colors"
+              />
+              <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center px-1 py-0.5 rounded border border-border/60 bg-muted/60 text-[10px] font-medium text-muted-foreground/50 select-none pointer-events-none">
+                ⌘K
+              </kbd>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Right actions */}
+          <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+
+            {/* EST clock */}
+            <div className="hidden lg:flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-border/60 bg-muted/30 font-mono text-[11px] select-none">
+              <Clock size={11} className="text-muted-foreground/50" />
+              <span className="text-muted-foreground/60 font-semibold tracking-wider">EST</span>
+              <span className="text-foreground/70 tabular-nums">{estTime}</span>
+            </div>
+
+            {/* New Deal */}
+            <a
+              href="/dashboard/deals/new"
+              className="flex items-center gap-1.5 h-8 px-3 bg-primary text-primary-foreground rounded-lg text-[13px] font-semibold hover:bg-primary/90 active:scale-95 transition-all"
+            >
+              <Plus size={14} />
+              New Deal
+            </a>
+
             <ThemeCustomizer variant="dropdown" />
-            <button className="p-2 rounded-lg hover:bg-accent">
-              <Bell size={18} />
+
+            <button className="relative p-2 rounded-lg hover:bg-accent transition-colors">
+              <Bell size={16} />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500" />
             </button>
           </div>
         </header>

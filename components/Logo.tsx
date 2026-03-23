@@ -11,59 +11,59 @@ interface LogoProps {
   variant?: 'light' | 'dark' | 'auto';
 }
 
-export function Logo({ size = 'md', showText = false, className = '', variant = 'auto' }: LogoProps) {
+export function Logo({ size = 'md', showText = false, className = '' }: LogoProps) {
   const { environmentName } = useTradeEnvironment();
-  
+
   const sizes = useMemo(() => ({
-    sm: { logo: 44, text: 'text-sm' },
-    md: { logo: 56, text: 'text-lg' },
-    lg: { logo: 75, text: 'text-xl' },
-    xl: { logo: 115, text: 'text-2xl' },
+    sm: { px: 44,  text: 'text-sm' },
+    md: { px: 56,  text: 'text-lg' },
+    lg: { px: 75,  text: 'text-xl' },
+    xl: { px: 115, text: 'text-2xl' },
   }), []);
 
-  const { logo } = sizes[size];
+  const { px } = sizes[size];
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <div 
-        className="relative flex-shrink-0 rounded-xl overflow-hidden"
-        style={{ width: logo, height: logo }}
+      <div
+        className="flex-shrink-0 rounded-xl overflow-hidden bg-black"
+        style={{ width: px, height: px }}
       >
         <Image
           src="/logo5.png"
           alt={environmentName}
-          fill
-          className="object-cover"
-          style={{ color: 'rgba(253, 252, 252, 0)' }}
-          quality={60}
+          width={px}
+          height={px}
+          className="w-full h-full object-cover"
+          quality={100}
           priority
         />
       </div>
-      <span className={`font-bold text-neutral-900 ${sizes[size].text}`}>
-        {environmentName.toUpperCase()}
-      </span>
+      {showText && (
+        <span className={`font-bold ${sizes[size].text}`}>
+          {environmentName.toUpperCase()}
+        </span>
+      )}
     </div>
   );
 }
 
-// Simplified version for just the icon
+// Compact icon variant for sidebars and nav bars
 export function LogoIcon({ size = 32, className = '' }: { size?: number; className?: string }) {
   return (
-    <div 
-      className={`relative flex-shrink-0 rounded-xl overflow-hidden ${className}`}
+    <div
+      className={`flex-shrink-0 rounded-lg overflow-hidden bg-black ${className}`}
       style={{ width: size, height: size }}
     >
       <Image
         src="/logo5.png"
         alt="Staunton Trade"
-        fill
-        className="object-cover"
-        style={{ color: 'rgba(253, 252, 252, 0)' }}
-        quality={60}
+        width={size}
+        height={size}
+        className="w-full h-full object-cover"
+        quality={100}
         priority
       />
     </div>
   );
 }
-
-
