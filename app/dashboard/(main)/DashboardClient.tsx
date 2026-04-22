@@ -82,9 +82,12 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
 
   const filteredDeals = useMemo(() => {
     return initialDeals.filter(deal => {
+      const buyerName = (deal as any).buyer?.full_name || (deal as any).buyer?.company_name || '';
+      const sellerName = (deal as any).seller?.full_name || (deal as any).seller?.company_name || '';
+      
       const matchesSearch = 
-        deal.buyer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        deal.seller_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        buyerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        sellerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         deal.commodity_type.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || deal.status === statusFilter;
@@ -162,9 +165,14 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string; dotColor: string }> = {
+      draft: { variant: 'secondary', label: 'Draft', dotColor: 'bg-gray-500' },
       pending: { variant: 'secondary', label: 'Pending', dotColor: 'bg-yellow-500' },
-      in_progress: { variant: 'default', label: 'In Progress', dotColor: 'bg-blue-500' },
+      active: { variant: 'default', label: 'Active', dotColor: 'bg-blue-500' },
+      injecting: { variant: 'default', label: 'Injecting', dotColor: 'bg-purple-500' },
+      inspection: { variant: 'default', label: 'Inspection', dotColor: 'bg-orange-500' },
       completed: { variant: 'outline', label: 'Completed', dotColor: 'bg-green-500' },
+      cancelled: { variant: 'destructive', label: 'Cancelled', dotColor: 'bg-red-500' },
+      disputed: { variant: 'destructive', label: 'Disputed', dotColor: 'bg-red-500' },
     };
     
     const { variant, label, dotColor } = config[status] || { variant: 'secondary', label: status, dotColor: 'bg-gray-500' };
@@ -477,11 +485,11 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <span className="font-medium">{deal.buyer_name}</span>
+                          <span className="font-medium">{(deal as any).buyer?.full_name || (deal as any).buyer?.company_name || 'TBD'}</span>
                           <div className="flex items-center gap-1">
                             <TrustIndicator 
-                              score={getTrustScore(deal.buyer_name).score}
-                              isVerified={getTrustScore(deal.buyer_name).isVerified}
+                              score={getTrustScore((deal as any).buyer?.full_name || 'Unknown').score}
+                              isVerified={getTrustScore((deal as any).buyer?.full_name || 'Unknown').isVerified}
                               size="sm"
                             />
                           </div>
@@ -489,18 +497,18 @@ export default function DashboardClient({ initialDeals, stats }: DashboardClient
                       </TableCell>
                       <TableCell>{getStatusBadge(deal.status)}</TableCell>
                       <TableCell className="text-right tabular-nums font-medium">
-                        {Number(deal.volume).toLocaleString()} BBL
+                        {Number(deal.quantity).toLocaleString()} MT
                       </TableCell>
                       <TableCell className="text-right tabular-nums font-semibold text-primary">
                         {formatCurrency(Number(deal.total_value))}
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <span className="text-muted-foreground">{deal.seller_name}</span>
+                          <span className="text-muted-foreground">{(deal as any).seller?.full_name || (deal as any).seller?.company_name || 'TBD'}</span>
                           <div className="flex items-center gap-1">
                             <TrustIndicator 
-                              score={getTrustScore(deal.seller_name).score}
-                              isVerified={getTrustScore(deal.seller_name).isVerified}
+                              score={getTrustScore((deal as any).seller?.full_name || 'Unknown').score}
+                              isVerified={getTrustScore((deal as any).seller?.full_name || 'Unknown').isVerified}
                               size="sm"
                             />
                           </div>

@@ -6,28 +6,24 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-// Deal Status Lifecycle
+// Deal Status Lifecycle (matches database enum)
 export type DealStatus = 
   | 'draft'
   | 'pending'
-  | 'counterparty_review'
-  | 'in_progress'
-  | 'injection_scheduled'
-  | 'injection_in_progress'
-  | 'verification'
+  | 'active'
+  | 'injecting'
+  | 'inspection'
   | 'completed'
   | 'cancelled'
   | 'disputed';
 
 // Deal Stage for progress tracking (0-100%)
 export const DEAL_STAGES: Record<DealStatus, number> = {
-  draft: 5,
-  pending: 15,
-  counterparty_review: 25,
-  in_progress: 40,
-  injection_scheduled: 55,
-  injection_in_progress: 70,
-  verification: 85,
+  draft: 10,
+  pending: 20,
+  active: 40,
+  injecting: 60,
+  inspection: 80,
   completed: 100,
   cancelled: 0,
   disputed: 0,
@@ -39,105 +35,124 @@ export interface Database {
       deals: {
         Row: {
           id: string
-          user_id: string
-          reference_number: string
-          commodity_type: string
-          volume: number
-          volume_unit: string
-          price_per_unit: number
-          total_value: number
-          buyer_name: string
           buyer_id: string | null
-          seller_name: string
           seller_id: string | null
+          broker_id: string | null
+          commodity_type: string
+          quantity: number
+          unit_price: number
+          total_value: number
+          currency: string
+          delivery_location: string
+          tank_farm: string | null
+          scheduled_injection_date: string | null
+          actual_injection_date: string | null
+          expected_completion_date: string | null
           status: DealStatus
           progress_percentage: number
-          contract_date: string | null
-          injection_date: string | null
-          injection_scheduled_time: string | null
-          injection_facility: string | null
-          delivery_date: string | null
+          reference_number: string
           vessel_name: string | null
-          vessel_imo: string | null
-          origin_port: string | null
-          destination_port: string | null
+          cargo_tracking_url: string | null
           current_location_lat: number | null
           current_location_lng: number | null
-          eta: string | null
+          last_location_update: string | null
+          contract_url: string | null
+          inspection_report_url: string | null
+          quality_certificate_url: string | null
+          bill_of_lading_url: string | null
           notes: string | null
-          staunton_report_id: string | null
+          created_by: string | null
           created_at: string
           updated_at: string
+          completed_at: string | null
         }
         Insert: {
           id?: string
-          user_id: string
-          reference_number?: string
-          commodity_type: string
-          volume: number | string
-          volume_unit?: string
-          price_per_unit: number | string
-          total_value: number | string
-          buyer_name: string
           buyer_id?: string | null
-          seller_name: string
           seller_id?: string | null
+          broker_id?: string | null
+          commodity_type: string
+          quantity: number | string
+          unit_price: number | string
+          currency?: string
+          delivery_location: string
+          tank_farm?: string | null
+          scheduled_injection_date?: string | null
+          actual_injection_date?: string | null
+          expected_completion_date?: string | null
           status?: DealStatus
           progress_percentage?: number
-          contract_date?: string | null
-          injection_date?: string | null
-          injection_scheduled_time?: string | null
-          injection_facility?: string | null
-          delivery_date?: string | null
+          reference_number?: string
           vessel_name?: string | null
-          vessel_imo?: string | null
-          origin_port?: string | null
-          destination_port?: string | null
+          cargo_tracking_url?: string | null
           current_location_lat?: number | null
           current_location_lng?: number | null
-          eta?: string | null
+          last_location_update?: string | null
+          contract_url?: string | null
+          inspection_report_url?: string | null
+          quality_certificate_url?: string | null
+          bill_of_lading_url?: string | null
           notes?: string | null
-          staunton_report_id?: string | null
+          created_by?: string | null
           created_at?: string
           updated_at?: string
+          completed_at?: string | null
         }
         Update: {
           id?: string
-          user_id?: string
-          reference_number?: string
-          commodity_type?: string
-          volume?: number
-          volume_unit?: string
-          price_per_unit?: number
-          total_value?: number
-          buyer_name?: string
           buyer_id?: string | null
-          seller_name?: string
           seller_id?: string | null
+          broker_id?: string | null
+          commodity_type?: string
+          quantity?: number
+          unit_price?: number
+          currency?: string
+          delivery_location?: string
+          tank_farm?: string | null
+          scheduled_injection_date?: string | null
+          actual_injection_date?: string | null
+          expected_completion_date?: string | null
           status?: DealStatus
           progress_percentage?: number
-          contract_date?: string | null
-          injection_date?: string | null
-          injection_scheduled_time?: string | null
-          injection_facility?: string | null
-          delivery_date?: string | null
+          reference_number?: string
           vessel_name?: string | null
-          vessel_imo?: string | null
-          origin_port?: string | null
-          destination_port?: string | null
+          cargo_tracking_url?: string | null
           current_location_lat?: number | null
           current_location_lng?: number | null
-          eta?: string | null
+          last_location_update?: string | null
+          contract_url?: string | null
+          inspection_report_url?: string | null
+          quality_certificate_url?: string | null
+          bill_of_lading_url?: string | null
           notes?: string | null
-          staunton_report_id?: string | null
+          created_by?: string | null
           created_at?: string
           updated_at?: string
+          completed_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "deals_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
+            foreignKeyName: "deals_buyer_id_fkey"
+            columns: ["buyer_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_seller_id_fkey"
+            columns: ["seller_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_broker_id_fkey"
+            columns: ["broker_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]

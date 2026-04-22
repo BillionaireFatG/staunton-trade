@@ -28,11 +28,15 @@ export default function Dashboard() {
           return
         }
 
-        // Fetch deals
+        // Fetch deals with related profiles
         const { data: dealsData } = await supabase
           .from('deals')
-          .select('*')
-          .eq('user_id', session.user.id)
+          .select(`
+            *,
+            buyer:buyer_id(id, full_name, company_name, verification_status, avatar_url),
+            seller:seller_id(id, full_name, company_name, verification_status, avatar_url)
+          `)
+          .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id},created_by.eq.${session.user.id}`)
           .order('created_at', { ascending: false })
 
         const dealsArray: Deal[] = dealsData || []
@@ -40,7 +44,7 @@ export default function Dashboard() {
 
         // Calculate stats
         const totalDeals = dealsArray.length
-        const activeDeals = dealsArray.filter(d => d.status === 'in_progress').length
+        const activeDeals = dealsArray.filter(d => d.status === 'active').length
         const totalVolume = dealsArray.reduce((sum, deal) => sum + Number(deal.total_value), 0)
         
         const now = new Date()

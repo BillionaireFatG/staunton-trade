@@ -116,6 +116,26 @@ export async function createDeal(input: CreateDealInput): Promise<Deal> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Validate required fields
+  if (!input.commodity_type) {
+    throw new Error('Commodity type is required');
+  }
+  if (!input.quantity || input.quantity <= 0) {
+    throw new Error('Quantity must be greater than 0');
+  }
+  if (!input.unit_price || input.unit_price <= 0) {
+    throw new Error('Unit price must be greater than 0');
+  }
+  if (!input.delivery_location || input.delivery_location.trim() === '') {
+    throw new Error('Delivery location is required');
+  }
+  if (!input.buyer_id) {
+    throw new Error('Buyer ID is required');
+  }
+  if (!input.seller_id) {
+    throw new Error('Seller ID is required');
+  }
+
   const { data, error } = await supabase
     .from('deals')
     .insert({
@@ -131,9 +151,22 @@ export async function createDeal(input: CreateDealInput): Promise<Deal> {
     `)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Supabase error creating deal:', error);
+    throw new Error(`Failed to create deal: ${error.message || 'Unknown error'}`);
+  }
 
-  await createDealEvent(data.id, 'created', 'Deal created');
+  if (!data) {
+    throw new Error('Failed to create deal: No data returned');
+  }
+
+  // Create deal event (non-blocking)
+  try {
+    await createDealEvent(data.id, 'created', 'Deal created');
+  } catch (eventError) {
+    console.error('Failed to create deal event:', eventError);
+    // Don't fail the deal creation if event creation fails
+  }
 
   return data;
 }

@@ -65,7 +65,37 @@ export default function NewDealPage() {
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user) {
+      alert('You must be logged in to create a deal.');
+      return;
+    }
+
+    // Validation: Ensure counterparty is selected
+    if (!selectedCounterparty || !selectedCounterparty.id) {
+      alert('Please select a valid counterparty before creating the deal.');
+      setStep(2); // Go back to counterparty selection
+      return;
+    }
+
+    // Validation: Ensure all required fields are filled
+    if (!quantity || parseFloat(quantity) <= 0) {
+      alert('Please enter a valid quantity.');
+      setStep(1);
+      return;
+    }
+
+    if (!unitPrice || parseFloat(unitPrice) <= 0) {
+      alert('Please enter a valid unit price.');
+      setStep(1);
+      return;
+    }
+
+    if (!deliveryLocation || deliveryLocation.trim() === '') {
+      alert('Please enter a delivery location.');
+      setStep(3);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -74,8 +104,8 @@ export default function NewDealPage() {
         quantity: parseFloat(quantity),
         unit_price: parseFloat(unitPrice),
         currency,
-        buyer_id: userRole === 'buyer' ? user.id : selectedCounterparty?.id,
-        seller_id: userRole === 'seller' ? user.id : selectedCounterparty?.id,
+        buyer_id: userRole === 'buyer' ? user.id : selectedCounterparty.id,
+        seller_id: userRole === 'seller' ? user.id : selectedCounterparty.id,
         delivery_location: deliveryLocation,
         tank_farm: tankFarm || undefined,
         scheduled_injection_date: scheduledDate || undefined,
@@ -86,9 +116,25 @@ export default function NewDealPage() {
 
       setCreatedDealId(deal.id);
       setSuccess(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating deal:', error);
-      alert('Failed to create deal. Please try again.');
+      
+      // Better error messaging
+      let errorMessage = 'Failed to create deal. ';
+      
+      if (error.message) {
+        errorMessage += error.message;
+      } else if (error.code === 'PGRST301') {
+        errorMessage += 'Database constraint violation. Please check that all fields are valid.';
+      } else if (error.code === '23503') {
+        errorMessage += 'Invalid counterparty selected. Please select a valid user.';
+      } else if (error.code === '42501') {
+        errorMessage += 'Permission denied. You may not have access to create deals.';
+      } else {
+        errorMessage += 'Please check your connection and try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -23,9 +23,13 @@ export default function ActiveDealsPage() {
 
         const { data: dealsData } = await supabase
           .from('deals')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .eq('status', 'in_progress')
+          .select(`
+            *,
+            buyer:buyer_id(id, full_name, company_name, verification_status, avatar_url),
+            seller:seller_id(id, full_name, company_name, verification_status, avatar_url)
+          `)
+          .or(`buyer_id.eq.${session.user.id},seller_id.eq.${session.user.id},created_by.eq.${session.user.id}`)
+          .eq('status', 'active')
           .order('created_at', { ascending: false })
 
         setDeals(dealsData || [])

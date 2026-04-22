@@ -15,7 +15,6 @@ import { congoShipments } from './congo/tracking'
 import { congoAnalytics } from './congo/analytics'
 import { congoCounterparties } from './congo/counterparties'
 import { congoReports } from './congo/reports'
-import { congoDeals } from './congo/deals'
 
 export function getMarketData(environment: TradeEnvironment) {
   return environment === 'congo' ? congoMarketData : stauntonMarketData
@@ -42,15 +41,11 @@ export function getReports(environment: TradeEnvironment) {
 }
 
 export function getDeals(environment: TradeEnvironment) {
-  // Congo has specific deals, Staunton uses Supabase real deals
-  // For demo purposes, return Congo deals when in Congo environment
-  if (environment === 'congo') {
-    return congoDeals
-  }
-  // For Staunton, return null to indicate should use Supabase
+  // All deals now come from Supabase (real database)
+  // Congo demo environment will use the same deals table
   return null
 }
 
 // Re-export types and data for direct imports
 export { stauntonMarketData, stauntonContracts, stauntonShipments, stauntonAnalytics, stauntonCounterparties, stauntonReports }
-export { congoMarketData, congoContracts, congoShipments, congoAnalytics, congoCounterparties, congoReports, congoDeals }
+export { congoMarketData, congoContracts, congoShipments, congoAnalytics, congoCounterparties, congoReports }
