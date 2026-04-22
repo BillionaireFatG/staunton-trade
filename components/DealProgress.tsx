@@ -13,11 +13,9 @@ interface DealProgressProps {
 const milestones = [
   { status: 'draft', label: 'Draft', icon: Clock },
   { status: 'pending', label: 'Pending', icon: Clock },
-  { status: 'counterparty_review', label: 'Review', icon: FileCheck },
-  { status: 'in_progress', label: 'In Progress', icon: ArrowRight },
-  { status: 'injection_scheduled', label: 'Scheduled', icon: Warehouse },
-  { status: 'injection_in_progress', label: 'Injection', icon: Truck },
-  { status: 'verification', label: 'Verification', icon: FileCheck },
+  { status: 'active', label: 'Active', icon: ArrowRight },
+  { status: 'injecting', label: 'Injecting', icon: Truck },
+  { status: 'inspection', label: 'Inspection', icon: FileCheck },
   { status: 'completed', label: 'Completed', icon: Check },
 ];
 
@@ -137,8 +135,10 @@ export function DealProgressBadge({ status, progress }: { status: DealStatus; pr
       case 'cancelled':
       case 'disputed':
         return { bg: 'bg-[#ef4444]/10', text: 'text-[#ef4444]', border: 'border-[#ef4444]/20' };
-      case 'injection_in_progress':
-      case 'verification':
+      case 'injecting':
+      case 'inspection':
+        return { bg: 'bg-[#3b82f6]/10', text: 'text-[#3b82f6]', border: 'border-[#3b82f6]/20' };
+      case 'active':
         return { bg: 'bg-[#3b82f6]/10', text: 'text-[#3b82f6]', border: 'border-[#3b82f6]/20' };
       default:
         return { bg: 'bg-[#f59e0b]/10', text: 'text-[#f59e0b]', border: 'border-[#f59e0b]/20' };
